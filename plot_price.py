@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from serverless import InstanceType, Zone
+from environment import InstanceType, Zone
 from utils import load_data
 
 if __name__ == "__main__":
