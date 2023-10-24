@@ -1,6 +1,7 @@
 import os
 
 import ujson
+import yaml
 
 
 def load_data():
@@ -13,3 +14,17 @@ def load_data():
         spot = ujson.load(f)
 
     return on_demand, spot
+
+
+def load_hyperparameters():
+    cwd = os.getcwd()
+    config_path = os.path.join(cwd, "config")
+
+    with open(os.path.join(config_path, "hyperparameters.yml"), "r") as f:
+        hyperparameters = yaml.load(f, Loader=yaml.FullLoader)
+
+    return hyperparameters
+
+
+if __name__ == "__main__":
+    print(load_hyperparameters())
