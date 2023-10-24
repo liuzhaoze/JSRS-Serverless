@@ -13141,7 +13141,7 @@
                     0.0609
                 ]
             },
-            "2xlarge": {
+            "xxlarge": {
                 "vCPU": 8,
                 "memory": 32768.0,
                 "price": [
@@ -28473,7 +28473,7 @@
                     0.0609
                 ]
             },
-            "2xlarge": {
+            "xxlarge": {
                 "vCPU": 8,
                 "memory": 32768.0,
                 "price": [
@@ -43805,7 +43805,7 @@
                     0.0609
                 ]
             },
-            "2xlarge": {
+            "xxlarge": {
                 "vCPU": 8,
                 "memory": 32768.0,
                 "price": [
@@ -59137,7 +59137,7 @@
                     0.0609
                 ]
             },
-            "2xlarge": {
+            "xxlarge": {
                 "vCPU": 8,
                 "memory": 32768.0,
                 "price": [

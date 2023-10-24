@@ -30,7 +30,7 @@
             "vCPU": 4,
             "memory": 16384.0
         },
-        "2xlarge": {
+        "xxlarge": {
             "price": 0.3712,
             "vCPU": 8,
             "memory": 32768.0
