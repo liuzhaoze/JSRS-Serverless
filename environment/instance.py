@@ -16,10 +16,11 @@ class InstanceType(Enum):
 
 
 class Zone(Enum):
-    us_east_1 = 0
-    us_east_2 = 1
-    us_west_1 = 2
-    us_west_2 = 3
+    no_record = 0  # 用于指明首次提交没有历史执行区域的任务
+    us_east_1 = 1
+    us_east_2 = 2
+    us_west_1 = 3
+    us_west_2 = 4
 
 
 class BillingType(Enum):
