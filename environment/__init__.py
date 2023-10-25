@@ -129,6 +129,9 @@ class Environment:
         self.__generate_workload()
         self.__init_queue()
 
+    def done(self) -> bool:
+        return self.submit_queue.empty()
+
     def instances_info(self, index: int = None) -> str:
         if index is None:
             info = ""
