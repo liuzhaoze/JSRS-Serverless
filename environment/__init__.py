@@ -1,4 +1,5 @@
 import os
+from queue import PriorityQueue
 
 import numpy as np
 import torch
@@ -21,9 +22,10 @@ class Environment:
         self.job_length_distribution = hyperparameters["job_length_distribution"]
         self.moldable_job_ratio = hyperparameters["moldable_job_ratio"]
 
+        # 环境状态
         self.instances = []  # 可供选择的实例
-        self.jobs = []
-        self.submit_queue = []  # 使用 job_id 作为队列元素
+        self.jobs = []  # 储存所有任务的状态
+        self.submit_queue = PriorityQueue()  # (submit_time, job_id) submit_time 越小优先级越高
 
     def __load_instances_config(self) -> None:
         if len(self.instances) != 0:
@@ -104,12 +106,28 @@ class Environment:
                 )
             )
 
+    def __submit_job(self, j: Job) -> None:
+        self.submit_queue.put((j.submit_time, j.job_id))
+
+    def __init_queue(self) -> None:
+        if len(self.jobs) == 0:
+            raise RuntimeError(
+                "Jobs have not been generated. You should generate jobs by using __generate_workload before initializing queue."
+            )
+        for j in self.jobs:
+            self.__submit_job(j)
+
     def reset(self) -> None:
+        # 重置环境状态
         self.instances.clear()
         self.jobs.clear()
-        self.submit_queue.clear()
+        with self.submit_queue.mutex:
+            self.submit_queue.queue.clear()
+
+        # 生成新状态
         self.__load_instances_config()
         self.__generate_workload()
+        self.__init_queue()
 
     def instances_info(self, index: int = None) -> str:
         if index is None:
@@ -128,3 +146,6 @@ class Environment:
             return info
         else:
             return str(self.jobs[index])
+
+    def queue_info(self) -> str:
+        return str(self.submit_queue.queue)
