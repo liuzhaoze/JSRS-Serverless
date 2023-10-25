@@ -152,3 +152,28 @@ class Environment:
 
     def queue_info(self) -> str:
         return str(self.submit_queue.queue)
+
+    def state_dim(self) -> int:
+        return 4 + len(self.instances)
+
+    def get_state(self) -> torch.Tensor:
+        """
+        状态向量的组成：
+        1. 当前任务的所需CPU数
+        2. 当前任务的所需内存
+        3. 当前任务的类型
+        4. 当前任务的上一次执行所在区域
+        5- 当前任务分配到每个实例上需要等待的时间
+        """
+        current_job_id = self.submit_queue.queue[0][1]
+        current_job = self.jobs[current_job_id]
+        state = [
+            current_job.required_cpu,
+            current_job.required_memory,
+            current_job.job_type.value,
+            current_job.last_zone.value,
+        ]
+        for instance in self.instances:
+            state.append(max(instance.idle_time - current_job.submit_time, 0))
+
+        return torch.tensor([state], device=self.device).float()
