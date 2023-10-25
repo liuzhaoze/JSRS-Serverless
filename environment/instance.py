@@ -85,5 +85,5 @@ class Instance:
             if self.remaining_lease_term == 0
             else f"{Fore.GREEN}{self.remaining_lease_term:.4f}{Fore.RESET}"
         )
-        info += " hour(s)"
+        info += f" hour(s) | Zone: {self.zone.name}"
         return info

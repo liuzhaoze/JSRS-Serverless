@@ -60,7 +60,5 @@ class Job:
 
     def __repr__(self) -> str:
         info = f"Job({self.job_id}) {self.required_cpu}CPU {self.required_memory}MB [{self.job_type.name}] "
-        info += (
-            f"Submit time: {self.submit_time:.4f} | Length: {self.length:.4f} hour(s)"
-        )
+        info += f"Submit time: {self.submit_time:.4f} | Length: {self.length:.4f} hour(s) | Last zone: {self.last_zone.name}"
         return info
