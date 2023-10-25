@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import torch
 import yaml
 
@@ -18,7 +19,7 @@ class Environment:
         self.n_jobs = hyperparameters["job_number"]
         self.submit_speed = hyperparameters["submit_speed"]
         self.job_length_distribution = hyperparameters["job_length_distribution"]
-        self.job_type_ratio = hyperparameters["job_type_ratio"]
+        self.moldable_job_ratio = hyperparameters["moldable_job_ratio"]
 
         self.instances = []  # 可供选择的实例
         self.jobs = []
@@ -42,11 +43,73 @@ class Environment:
                 )
             )
 
+    def __max_cpu(self) -> int:
+        return max([instance.vCPU for instance in self.instances])
+
+    def __max_memory(self) -> float:
+        return max([instance.memory for instance in self.instances])
+
+    def __generate_workload(self) -> None:
+        if len(self.jobs) != 0:
+            raise RuntimeError(
+                "Jobs have been generated. You should make self.jobs empty before generating jobs."
+            )
+        # 生成任务所需核心数
+        required_cpus = np.random.randint(1, self.__max_cpu() + 1, self.n_jobs)
+
+        # 生成任务所需内存
+        required_memories = np.random.uniform(100.0, self.__max_memory(), self.n_jobs)
+
+        # 生成任务长度
+        match self.job_length_distribution["name"]:
+            case "uniform":
+                job_lengths = np.random.uniform(
+                    self.job_length_distribution["parameters"][0],
+                    self.job_length_distribution["parameters"][1],
+                    self.n_jobs,
+                )
+            case "normal":
+                job_lengths = np.random.normal(
+                    self.job_length_distribution["parameters"][0],
+                    self.job_length_distribution["parameters"][1],
+                    self.n_jobs,
+                )
+            case _:
+                raise ValueError(
+                    f"Unknown job length distribution: {self.job_length_distribution['name']}"
+                )
+
+        # 生成任务提交间隔
+        submit_intervals = np.random.exponential(1 / self.submit_speed, self.n_jobs)
+
+        # 生成任务类型
+        job_types = np.random.choice(
+            [JobType.moldable, JobType.rigid],
+            self.n_jobs,
+            p=[self.moldable_job_ratio, 1.0 - self.moldable_job_ratio],
+        )
+
+        # 生成任务
+        submit_time = 0.0
+        for i in range(self.n_jobs):
+            submit_time += submit_intervals[i]
+            self.jobs.append(
+                Job(
+                    i,
+                    required_cpus[i],
+                    required_memories[i],
+                    job_types[i],
+                    submit_time,
+                    job_lengths[i],
+                )
+            )
+
     def reset(self) -> None:
         self.instances.clear()
         self.jobs.clear()
         self.submit_queue.clear()
         self.__load_instances_config()
+        self.__generate_workload()
 
     def instances_info(self, index: int = None) -> str:
         if index is None:
@@ -56,3 +119,12 @@ class Environment:
             return info
         else:
             return str(self.instances[index])
+
+    def jobs_info(self, index: int = None) -> str:
+        if index is None:
+            info = ""
+            for job in self.jobs:
+                info += str(job) + "\n"
+            return info
+        else:
+            return str(self.jobs[index])

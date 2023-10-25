@@ -13,4 +13,4 @@ submit_speed: 20 # 任务提交速度 在一个小时内提交的任务数量 �
 job_length_distribution:
   name: uniform # 均匀分布 uniform 正态分布 normal
   parameters: [0.5, 2] # 任务长度分布的参数 均匀分布 [min, max] 正态分布 [mean, std]
-job_type_ratio: 0.5 # Moldable 类型的任务占全部任务的比例
+moldable_job_ratio: 0.5 # Moldable 类型的任务占全部任务的比例
