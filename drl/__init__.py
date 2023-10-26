@@ -8,6 +8,7 @@ import torch.nn.functional as F
 
 
 class DQN(nn.Module):
+    # TODO: 改用噪声网络
     def __init__(self, state_dim: int, action_dim: int) -> None:
         super().__init__()
 
