@@ -180,6 +180,47 @@ class Environment:
 
         return torch.tensor([state], device=self.device).float()
 
+    def action_dim(self) -> int:
+        return len(self.instances)
+
+    def take_action(self, action: int) -> torch.Tensor:
+        current_job_id = self.submit_queue.get()[1]
+        current_job = self.jobs[current_job_id]
+        target_instance = self.instances[action]
+
+        # 计算 reward
+        if (current_job.required_memory > target_instance.memory) or (
+            current_job.job_type == JobType.rigid
+            and current_job.required_cpu > target_instance.vCPU
+        ):
+            updated_instance, updated_job = target_instance, current_job
+            reward = -5.0
+        else:
+            updated_instance, updated_job, result = Environment.assign(
+                target_instance, current_job
+            )
+            updated_job.add_history(
+                result.submit_time,
+                result.start_time,
+                result.end_time,
+                action,
+                updated_job.finished(),
+            )
+            reward = (
+                (1 + np.exp(1.5 - result.cost))
+                * (result.end_time - result.start_time)
+                / (result.end_time - result.submit_time)
+            )
+
+        # 更新实例和任务状态
+        self.instances[action] = updated_instance
+        self.jobs[current_job_id] = updated_job
+        # 更新任务队列
+        if not updated_job.finished():
+            self.__submit_job(updated_job)
+
+        return torch.tensor([reward], device=self.device).float()
+
     @staticmethod
     def load_time(instance: Instance, job: Job) -> float:
         if job.last_zone == Zone.no_record or job.last_zone == instance.zone:
@@ -283,4 +324,8 @@ class Environment:
                 f"Time error.\n{t_submit} {t_begin} {t_end}\n{job}\n{instance}"
             )
 
-        return instance, job, (cost, t_submit, t_begin, t_end, t_wasted)
+        return (
+            instance,
+            job,
+            Environment.AssignResult(cost, t_submit, t_begin, t_end, t_wasted),
+        )
