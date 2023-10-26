@@ -31,6 +31,7 @@ class Environment:
 
         # 评价指标
         self.total_cost = 0.0
+        self.success_count = self.fail_count = 0
 
     def __load_instances_config(self) -> None:
         if len(self.instances) != 0:
@@ -137,6 +138,7 @@ class Environment:
 
         # 重置评价指标
         self.total_cost = 0.0
+        self.success_count = self.fail_count = 0
 
         # 生成新状态
         self.__load_instances_config()
@@ -211,6 +213,7 @@ class Environment:
         ):
             updated_instance, updated_job = target_instance, current_job
             reward = -5.0
+            self.fail_count += 1  # 更新评价指标
         else:
             updated_instance, updated_job, result = Environment.assign(
                 target_instance, current_job
@@ -227,6 +230,7 @@ class Environment:
                 * (result.end_time - result.start_time)
                 / (result.end_time - result.submit_time)
             )
+            self.success_count += 1  # 更新评价指标
 
         # 更新实例和任务状态
         self.instances[action] = updated_instance
@@ -351,3 +355,6 @@ class Environment:
 
     def get_total_cost(self) -> float:
         return self.total_cost
+
+    def get_success_rate(self) -> float:
+        return float(self.success_count) / float(self.success_count + self.fail_count)

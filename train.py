@@ -85,6 +85,7 @@ if __name__ == "__main__":
 
         writer.add_scalar("Episode Track/return", return_per_episode, episode)
         writer.add_scalar("Episode Track/cost", env.get_total_cost(), episode)
+        writer.add_scalar("Episode Track/success rate", env.get_success_rate(), episode)
 
         if episode % target_update == 0:
             # 更新 target_net 参数
