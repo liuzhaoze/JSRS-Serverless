@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 from agent import DRLAgent
 from drl import (
@@ -46,7 +47,7 @@ if __name__ == "__main__":
 
     global_step = 0
 
-    for episode in range(num_episodes):
+    for episode in tqdm(range(num_episodes)):
         env.reset()
         state = env.get_state()
 
@@ -83,6 +84,7 @@ if __name__ == "__main__":
                 break
 
         writer.add_scalar("Episode Track/return", return_per_episode, episode)
+        writer.add_scalar("Episode Track/cost", env.get_total_cost(), episode)
 
         if episode % target_update == 0:
             # 更新 target_net 参数

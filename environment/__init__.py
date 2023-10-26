@@ -29,6 +29,9 @@ class Environment:
         self.jobs = []  # 储存所有任务的状态
         self.submit_queue = PriorityQueue()  # (submit_time, job_id) submit_time 越小优先级越高
 
+        # 评价指标
+        self.total_cost = 0.0
+
     def __load_instances_config(self) -> None:
         if len(self.instances) != 0:
             raise RuntimeError(
@@ -132,6 +135,9 @@ class Environment:
         with self.submit_queue.mutex:
             self.submit_queue.queue.clear()
 
+        # 重置评价指标
+        self.total_cost = 0.0
+
         # 生成新状态
         self.__load_instances_config()
         self.__generate_workload()
@@ -228,6 +234,9 @@ class Environment:
         # 更新任务队列
         if not updated_job.finished():
             self.__submit_job(updated_job)
+
+        # 更新评价指标
+        self.total_cost += result.cost
 
         return torch.tensor([reward], device=self.device).float()
 
@@ -339,3 +348,6 @@ class Environment:
             job,
             Environment.AssignResult(cost, t_submit, t_begin, t_end, t_wasted),
         )
+
+    def get_total_cost(self) -> float:
+        return self.total_cost
