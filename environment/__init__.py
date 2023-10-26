@@ -147,7 +147,7 @@ class Environment:
                 info += f"{i}: {instance}\n"
             return info
         else:
-            return str(self.instances[index])
+            return str(self.instances[index]) + "\n"
 
     def jobs_info(self, index: int = None) -> str:
         if index is None:
@@ -156,10 +156,10 @@ class Environment:
                 info += str(job) + "\n"
             return info
         else:
-            return str(self.jobs[index])
+            return str(self.jobs[index]) + "\n"
 
     def queue_info(self) -> str:
-        return str(self.submit_queue.queue)
+        return str(self.submit_queue.queue) + "\n"
 
     def state_dim(self) -> int:
         return 4 + len(self.instances)
@@ -173,6 +173,10 @@ class Environment:
         4. 当前任务的上一次执行所在区域
         5- 当前任务分配到每个实例上需要等待的时间
         """
+        if self.done():
+            # episode 结束时的状态为全零向量
+            return torch.zeros(self.state_dim(), device=self.device).float()
+
         current_job_id = self.__glimpse_job_id()
         current_job = self.jobs[current_job_id]
         state = [
@@ -184,7 +188,7 @@ class Environment:
         for instance in self.instances:
             state.append(max(instance.idle_time - current_job.submit_time, 0))
 
-        return torch.tensor([state], device=self.device).float()
+        return torch.tensor(state, device=self.device).float()
 
     def action_dim(self) -> int:
         return len(self.instances)
