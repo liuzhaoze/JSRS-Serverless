@@ -212,8 +212,9 @@ class Environment:
             and current_job.required_cpu > target_instance.vCPU
         ):
             updated_instance, updated_job = target_instance, current_job
-            reward = -5.0
-            self.fail_count += 1  # 更新评价指标
+            reward = -100
+            # 更新评价指标
+            self.fail_count += 1
         else:
             updated_instance, updated_job, result = Environment.assign(
                 target_instance, current_job
@@ -230,7 +231,9 @@ class Environment:
                 * (result.end_time - result.start_time)
                 / (result.end_time - result.submit_time)
             )
-            self.success_count += 1  # 更新评价指标
+            # 更新评价指标
+            self.success_count += 1
+            self.total_cost += result.cost
 
         # 更新实例和任务状态
         self.instances[action] = updated_instance
@@ -238,9 +241,6 @@ class Environment:
         # 更新任务队列
         if not updated_job.finished():
             self.__submit_job(updated_job)
-
-        # 更新评价指标
-        self.total_cost += result.cost
 
         return torch.tensor([reward], device=self.device).float()
 
