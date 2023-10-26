@@ -111,6 +111,12 @@ class Environment:
     def __submit_job(self, j: Job) -> None:
         self.submit_queue.put((j.submit_time, j.job_id))
 
+    def __pop_job_id(self) -> int:
+        return self.submit_queue.get()[1]
+
+    def __glimpse_job_id(self) -> int:
+        return self.submit_queue.queue[0][1]
+
     def __init_queue(self) -> None:
         if len(self.jobs) == 0:
             raise RuntimeError(
@@ -167,7 +173,7 @@ class Environment:
         4. 当前任务的上一次执行所在区域
         5- 当前任务分配到每个实例上需要等待的时间
         """
-        current_job_id = self.submit_queue.queue[0][1]
+        current_job_id = self.__glimpse_job_id()
         current_job = self.jobs[current_job_id]
         state = [
             current_job.required_cpu,
@@ -184,7 +190,7 @@ class Environment:
         return len(self.instances)
 
     def take_action(self, action: int) -> torch.Tensor:
-        current_job_id = self.submit_queue.get()[1]
+        current_job_id = self.__pop_job_id()
         current_job = self.jobs[current_job_id]
         target_instance = self.instances[action]
 
