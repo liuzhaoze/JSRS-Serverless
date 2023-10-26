@@ -27,7 +27,7 @@ Experience = namedtuple("Experience", ("state", "action", "reward", "next_state"
 
 
 class ReplayMemory:
-    def __init__(self, capacity) -> None:
+    def __init__(self, capacity: int) -> None:
         self.capacity = capacity
         self.memory = []
         self.push_count = 0
