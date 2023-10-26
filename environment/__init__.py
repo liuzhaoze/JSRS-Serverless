@@ -1,4 +1,5 @@
 import os
+from collections import namedtuple
 from queue import PriorityQueue
 
 import numpy as np
@@ -9,6 +10,7 @@ from utils import load_hyperparameters
 
 from .instance import *
 from .job import *
+from .speedup_model import SpeedupModel
 
 
 class Environment:
@@ -177,3 +179,108 @@ class Environment:
             state.append(max(instance.idle_time - current_job.submit_time, 0))
 
         return torch.tensor([state], device=self.device).float()
+
+    @staticmethod
+    def load_time(instance: Instance, job: Job) -> float:
+        if job.last_zone == Zone.no_record or job.last_zone == instance.zone:
+            return job.required_memory / Instance.load_speed / 3600.0
+        else:
+            return 2 * job.required_memory / Instance.load_speed / 3600.0
+
+    @staticmethod
+    def suspend_time(instance: Instance, job: Job) -> float:
+        return job.required_memory / Instance.suspend_speed / 3600.0
+
+    @staticmethod
+    def exec_time(instance: Instance, job: Job) -> float:
+        match job.job_type:
+            case JobType.moldable:
+                return (
+                    job.length
+                    * SpeedupModel.SU(job.required_cpu)
+                    / SpeedupModel.SU(instance.vCPU)
+                )
+            case JobType.rigid:
+                if job.required_cpu > instance.vCPU:
+                    raise RuntimeError("CPU is not enough.")
+                return job.length
+
+    @staticmethod
+    def exec_time_invert(t_exec: float, instance: Instance, job: Job) -> float:
+        match job.job_type:
+            case JobType.moldable:
+                return (
+                    t_exec
+                    * SpeedupModel.SU(instance.vCPU)
+                    / SpeedupModel.SU(job.required_cpu)
+                )
+            case JobType.rigid:
+                return t_exec
+
+    AssignResult = namedtuple(
+        "AssignResult", ["cost", "submit_time", "start_time", "end_time", "wasted_time"]
+    )
+
+    @staticmethod
+    def assign(instance: Instance, job: Job) -> (Instance, Job, AssignResult):
+        if job.required_memory > instance.memory:
+            raise RuntimeError("Memory is not enough.")
+        if job.job_type == JobType.rigid and job.required_cpu > instance.vCPU:
+            raise RuntimeError("CPU is not enough.")
+
+        t_submit = job.submit_time  # 作为返回值记录
+
+        # 在实例空闲后提交任务，产生时间浪费
+        t_wasted = 0.0
+        if job.submit_time >= instance.idle_time + instance.remaining_lease_term:
+            t_wasted = instance.remaining_lease_term
+            # 更新实例状态
+            instance.remaining_lease_term = 0.0
+            instance.idle_time = job.submit_time
+        elif job.submit_time > instance.idle_time:
+            t_wasted = job.submit_time - instance.idle_time
+            # 更新实例状态
+            instance.remaining_lease_term -= t_wasted
+            instance.idle_time = job.submit_time
+
+        assert job.submit_time <= instance.idle_time
+
+        t_load = Environment.load_time(instance, job)
+        t_suspend = Environment.suspend_time(instance, job)
+        t_exec = Environment.exec_time(instance, job)
+
+        # 租用实例
+        cost = 0.0
+        while instance.remaining_lease_term - t_load - t_suspend <= 0:
+            cost += instance.rent(instance.idle_time)
+
+        # 执行任务
+        if t_exec <= instance.remaining_lease_term - t_load:
+            # 任务全部执行
+            t_begin = instance.idle_time + t_load
+            t_end = t_begin + t_exec
+            # 更新实例状态
+            instance.idle_time = t_end
+            instance.remaining_lease_term -= t_load + t_exec
+            # 更新任务状态
+            job.length = 0.0
+            job.last_zone = instance.zone
+        else:
+            # 任务部分执行
+            t_begin = instance.idle_time + t_load
+            t_end = instance.idle_time + instance.remaining_lease_term - t_suspend
+            t_exec_actual = t_end - t_begin
+            # 更新实例状态
+            instance.idle_time += instance.remaining_lease_term
+            instance.remaining_lease_term = 0.0
+            # 更新任务状态
+            job.length -= Environment.exec_time_invert(t_exec_actual, instance, job)
+            job.last_zone = instance.zone
+            job.submit_time = instance.idle_time
+
+        if not 0 < t_submit < t_begin < t_end:
+            raise RuntimeError(
+                f"Time error.\n{t_submit} {t_begin} {t_end}\n{job}\n{instance}"
+            )
+
+        return instance, job, (cost, t_submit, t_begin, t_end, t_wasted)
