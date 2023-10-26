@@ -61,6 +61,16 @@ class Job:
             tabulate.tabulate(self.exec_history, headers="keys", tablefmt="fancy_grid")
         )
 
+    def total_response_time(self) -> float:
+        if not self.finished():
+            raise Exception("Job is not finished yet.")
+        return (self.exec_history["end_time"] - self.exec_history["submit_time"]).sum()
+
+    def total_execution_time(self) -> float:
+        if not self.finished():
+            raise Exception("Job is not finished yet.")
+        return (self.exec_history["end_time"] - self.exec_history["start_time"]).sum()
+
     def __repr__(self) -> str:
         info = f"Job({self.job_id}) {self.required_cpu}CPU {self.required_memory:.2f}MB [{self.job_type.name}] "
         info += f"Submit time: {self.submit_time:.4f} | Length: {self.length:.4f} hour(s) | Last zone: {self.last_zone.name}"

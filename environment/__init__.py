@@ -358,3 +358,6 @@ class Environment:
 
     def get_success_rate(self) -> float:
         return float(self.success_count) / float(self.success_count + self.fail_count)
+
+    def get_jobs_response_time(self) -> list[float]:
+        return [job.total_response_time() for job in self.jobs]
