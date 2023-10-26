@@ -61,3 +61,47 @@ class EpsilonGreedyStrategy:
         return self.end + (self.start - self.end) * math.exp(
             -1.0 * current_step * self.decay
         )
+
+
+def extract_tensors(experiences: list[Experience]) -> tuple[torch.Tensor]:
+    # Convert batch of Experiences to Experience of batches
+    batch = Experience(*zip(*experiences))
+
+    states = torch.stack(batch.state)
+    actions = torch.cat(batch.action)
+    rewards = torch.cat(batch.reward)
+    next_states = torch.stack(batch.next_state)
+
+    return (states, actions, rewards, next_states)
+
+
+class QValues:
+    # TODO: 完成带 mask 版本的
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    @staticmethod
+    def get_current(
+        policy_net, states: torch.Tensor, actions: torch.Tensor
+    ) -> torch.Tensor:
+        return policy_net(states).gather(dim=1, index=actions.unsqueeze(-1))
+
+    @staticmethod
+    def get_next(target_net, next_states: torch.Tensor) -> torch.Tensor:
+        # 首先找到下一个状态是终止状态的样本索引
+        final_state_locations = (
+            next_states.flatten(start_dim=1).max(dim=1).values.eq(0).type(torch.bool)
+        )  # 向量的最大分量为 0 的向量是全零向量，代表终止状态
+        # 然后找到下一个状态不是终止状态的样本索引
+        non_final_state_locations = final_state_locations == False
+        # 下一个状态不是终止状态的样本
+        non_final_states = next_states[non_final_state_locations]
+
+        next_q_values = torch.zeros(next_states.shape[0], device=QValues.device)
+        next_q_values[non_final_state_locations] = (
+            target_net(non_final_states).max(dim=1).values.detach()
+        )
+        # 终止状态样本的 next_q_values 为 0
+        # 因为计算 TD target: target_q_value = reward + (next_q_value * gamma) 时
+        # reward 已经是 return 中需要加的最后一个奖励了，所以后面的 next_q_value 应该是 0
+
+        return next_q_values
