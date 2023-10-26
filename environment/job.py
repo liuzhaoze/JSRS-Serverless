@@ -37,6 +37,9 @@ class Job:
             columns=["submit_time", "start_time", "end_time", "instance_id", "finished"]
         )
 
+    def finished(self) -> bool:
+        return self.length == 0
+
     def add_history(
         self,
         submit_time: float,
