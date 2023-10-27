@@ -20,6 +20,7 @@ from utils import load_hyperparameters
 
 if __name__ == "__main__":
     hyperparameters = load_hyperparameters()
+    use_mask = hyperparameters["use_mask"]
     batch_size = hyperparameters["batch_size"]
     gamma = hyperparameters["gamma"]
     epsilon_start = hyperparameters["epsilon_start"]
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     writer = SummaryWriter()
-    env = Environment(device)
+    env = Environment(use_mask, device)
     env.reset()  # 必须 reset 之后才能加载实例配置，env.action_dim() 才能返回正确的值
     epsilon_greedy = EpsilonGreedyStrategy(epsilon_start, epsilon_end, epsilon_decay)
     drl_agent = DRLAgent(epsilon_greedy, env.action_dim(), device)
@@ -49,26 +50,28 @@ if __name__ == "__main__":
 
     for episode in tqdm(range(num_episodes)):
         env.reset()
-        state = env.get_state()
+        state, mask = env.get_state()
 
         return_per_episode = 0.0
 
         for step in count():
-            action = drl_agent.select_action(None, state, policy_net)
+            action = drl_agent.select_action(mask, state, policy_net)
             reward = env.take_action(action.item())
-            next_state = env.get_state()
-            memory.push(Experience(state, action, reward, next_state))
-            state = next_state
+            next_state, next_mask = env.get_state()
+            memory.push(Experience(state, action, reward, next_state, next_mask))
+            state, mask = next_state, next_mask
 
             writer.add_scalar("Step Track/reward", reward, global_step)
             return_per_episode += reward.item()
 
             if memory.can_provide_sample(batch_size, dqn_update_threshold):
                 experiences = memory.sample(batch_size)
-                states, actions, rewards, next_states = extract_tensors(experiences)
+                states, actions, rewards, next_states, next_masks = extract_tensors(
+                    experiences
+                )
 
                 current_q_values = QValues.get_current(policy_net, states, actions)
-                next_q_values = QValues.get_next(target_net, next_states)
+                next_q_values = QValues.get_next(target_net, next_states, next_masks)
                 target_q_values = rewards + gamma * next_q_values
 
                 loss = F.mse_loss(current_q_values, target_q_values.unsqueeze(1))

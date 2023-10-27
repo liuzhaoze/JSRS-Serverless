@@ -23,7 +23,9 @@ class DQN(nn.Module):
         return t
 
 
-Experience = namedtuple("Experience", ("state", "action", "reward", "next_state"))
+Experience = namedtuple(
+    "Experience", ("state", "action", "reward", "next_state", "next_mask")
+)
 
 
 class ReplayMemory:
@@ -71,12 +73,12 @@ def extract_tensors(experiences: list[Experience]) -> tuple[torch.Tensor]:
     actions = torch.cat(batch.action)
     rewards = torch.cat(batch.reward)
     next_states = torch.stack(batch.next_state)
+    next_masks = torch.stack(batch.next_mask)
 
-    return (states, actions, rewards, next_states)
+    return (states, actions, rewards, next_states, next_masks)
 
 
 class QValues:
-    # TODO: 完成带 mask 版本的
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     @staticmethod
@@ -86,7 +88,9 @@ class QValues:
         return policy_net(states).gather(dim=1, index=actions.unsqueeze(-1))
 
     @staticmethod
-    def get_next(target_net, next_states: torch.Tensor) -> torch.Tensor:
+    def get_next(
+        target_net, next_states: torch.Tensor, next_masks: torch.Tensor
+    ) -> torch.Tensor:
         # 首先找到下一个状态是终止状态的样本索引
         final_state_locations = (
             next_states.flatten(start_dim=1).max(dim=1).values.eq(0).type(torch.bool)
@@ -95,10 +99,15 @@ class QValues:
         non_final_state_locations = final_state_locations == False
         # 下一个状态不是终止状态的样本
         non_final_states = next_states[non_final_state_locations]
+        # 下一个状态不是终止状态的掩码
+        non_final_masks = next_masks[non_final_state_locations]
 
         next_q_values = torch.zeros(next_states.shape[0], device=QValues.device)
         next_q_values[non_final_state_locations] = (
-            target_net(non_final_states).max(dim=1).values.detach()
+            target_net(non_final_states)
+            .where(non_final_masks, float("-inf"))  # DOUBT: 会不会影响梯度计算？
+            .max(dim=1)
+            .values.detach()
         )
         # 终止状态样本的 next_q_values 为 0
         # 因为计算 TD target: target_q_value = reward + (next_q_value * gamma) 时

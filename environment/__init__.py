@@ -183,8 +183,10 @@ class Environment:
         5- 当前任务分配到每个实例上需要等待的时间
         """
         if self.done():
-            # episode 结束时的状态为全零向量
-            return torch.zeros(self.state_dim(), device=self.device).float(), None
+            # episode 结束时的状态为全零向量，掩码向量为全假向量
+            s = torch.zeros(self.state_dim(), device=self.device).float()
+            m = torch.zeros(self.action_dim(), dtype=torch.bool, device=self.device)
+            return s, m
 
         current_job_id = self.__glimpse_job_id()
         current_job = self.jobs[current_job_id]

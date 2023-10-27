@@ -22,15 +22,19 @@ class DRLAgent(AgentBase):
     def select_action(
         self, mask: torch.Tensor, state: torch.Tensor, policy_net
     ) -> torch.Tensor:
-        # TODO: 完成带 mask 版本的
         epsilon = self.strategy.get_epsilon(self.current_step)
         self.current_step += 1
 
         if random.random() < epsilon:
             # explore
-            action = random.randrange(self.action_dim)
-            return torch.tensor([action], device=self.device)
+            return random.choice(mask.nonzero()).to(self.device)
         else:
             # exploit
             with torch.no_grad():
-                return policy_net(state).unsqueeze(dim=0).argmax(dim=1).to(self.device)
+                return (
+                    policy_net(state)
+                    .where(mask, float("-inf"))  # DOUBT: 会不会影响梯度计算？
+                    .unsqueeze(dim=0)
+                    .argmax(dim=1)
+                    .to(self.device)
+                )
