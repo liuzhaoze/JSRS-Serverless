@@ -1,7 +1,7 @@
 # 实例
-load_speed: 81.27 # 加载速度 任务从硬盘加载到内存的速度 MB/s
-suspend_speed: 63.67 # 挂起速度 任务从内存挂起到硬盘的速度 MB/s
-rental_time: 1.0 # 一次租赁操作所续租的时间
+load_speed: 81.27     # 加载速度 任务从硬盘加载到内存的速度 MB/s
+suspend_speed: 63.67  # 挂起速度 任务从内存挂起到硬盘的速度 MB/s
+rental_time: 1.0      # 一次租赁操作所续租的时间
 
 # Downey's speedup model
 A: 64
@@ -9,21 +9,21 @@ sigma: 0.0
 
 # 环境
 job_number: 100
-submit_speed: 20 # 任务提交速度 在一个小时内提交的任务数量 即任务提交间隔分布中的 lambda
+submit_speed: 20           # 任务提交速度 在一个小时内提交的任务数量 即任务提交间隔分布中的 lambda
 job_length_distribution:
-  name: uniform # 均匀分布 uniform 正态分布 normal
-  parameters: [0.5, 2] # 任务长度分布的参数 均匀分布 [min, max] 正态分布 [mean, std]
-moldable_job_ratio: 0.5 # Moldable 类型的任务占全部任务的比例
+  name: uniform            # 均匀分布 uniform 正态分布 normal
+  parameters: [0.5, 2]     # 任务长度分布的参数 均匀分布 [min, max] 正态分布 [mean, std]
+moldable_job_ratio: 0.5    # Moldable 类型的任务占全部任务的比例
 
 # 深度强化学习 DQN 超参数
-use_mask: True # 是否使用 mask 屏蔽不可用 action
-batch_size: 256 # 单次更新 DQN 的样本数量
-gamma: 0.99 # 回报 return 中的折扣因子
-epsilon_start: 1.0 # ε-greedy 算法中 ε 的初始值
-epsilon_end: 0.01 # ε-greedy 算法中 ε 的最终值
-epsilon_decay: 0.001 # ε-greedy 算法中 ε 的衰减速率
-target_update: 10 # target Q net 的更新频率 每几个 episode 更新一次
-replay_memory_size: 1000000 # 经验回放池的大小 通常为 10^5 ~ 10^6
-dqn_update_threshold: 10000 # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
-learning_rate: 0.001 # DQN 的学习率
-num_episodes: 100 # 训练的轮数
+use_mask: True               # 是否使用 mask 屏蔽不可用 action
+batch_size: 256              # 单次更新 DQN 的样本数量
+gamma: 0.99                  # 回报 return 中的折扣因子
+epsilon_start: 1.0           # ε-greedy 算法中 ε 的初始值
+epsilon_end: 0.01            # ε-greedy 算法中 ε 的最终值
+epsilon_decay: 0.001         # ε-greedy 算法中 ε 的衰减速率
+target_update: 10            # target Q net 的更新频率 每几个 episode 更新一次
+replay_memory_size: 1000000  # 经验回放池的大小 通常为 10^5 ~ 10^6
+dqn_update_threshold: 10000  # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
+learning_rate: 0.001         # DQN 的学习率
+num_episodes: 100            # 训练的轮数
