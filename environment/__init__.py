@@ -192,6 +192,8 @@ class Environment:
         current_job = self.jobs[current_job_id]
 
         # 生成状态向量
+        # NOTE: 需要同步修改 Environment state_dim 函数
+        # NOTE: 需要同步修改 agent.EarliestAgent select_action 函数
         state = [
             current_job.required_cpu,
             current_job.required_memory,
