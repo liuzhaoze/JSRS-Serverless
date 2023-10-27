@@ -2,10 +2,11 @@ import os
 import sys
 from itertools import count
 
+import matplotlib.pyplot as plt
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from agent import DRLAgent
+from agent import DRLAgent, EarliestAgent, RandomAgent, RoundRobinAgent
 from drl import DQN, EpsilonGreedyStrategy
 from environment import Environment
 from utils import load_hyperparameters
@@ -31,22 +32,50 @@ if __name__ == "__main__":
 
     epsilon_greedy = EpsilonGreedyStrategy(0, 0, 0)
     drl_agent = DRLAgent(epsilon_greedy, env.action_dim(), device)
+    random_agent = RandomAgent(env.action_dim(), device)
+    rr_agent = RoundRobinAgent(env.action_dim(), device)
+    earliest_agent = EarliestAgent(env.action_dim(), device)
 
-    # 开始评估
-    env.reset()
-    state, mask = env.get_state()
+    agent_names = ["drl", "random", "round_robin", "earliest"]
+    agents = [drl_agent, random_agent, rr_agent, earliest_agent]
+    cost = []
+    average_response_time = []
 
-    for step in count():
-        action = drl_agent.select_action(mask, state, policy_net)
-        reward = env.take_action(action.item())
-        next_state, next_mask = env.get_state()
-        state, mask = next_state, next_mask
+    for name, agent in zip(agent_names, agents):
+        # 开始评估
+        env.reset()
+        state, mask = env.get_state()
 
-        if env.done():
-            break
+        for step in count():
+            action = agent.select_action(mask, state, policy_net)
+            reward = env.take_action(action.item())
+            next_state, next_mask = env.get_state()
+            state, mask = next_state, next_mask
 
-    print(f"cost: {env.get_total_cost()}")
-    print(f"success rate: {env.get_success_rate()}")
-    print(
-        f"average response time: {sum(jobs_resp := env.get_jobs_response_time()) / len(jobs_resp)}"
-    )
+            if env.done():
+                break
+
+        print(f"agent: {name}")
+
+        cost.append(c := env.get_total_cost())
+        print(f"cost: {c}")
+        writer.add_text(name, f"cost: {c}")
+
+        jobs_resp = env.get_jobs_response_time()
+        average_response_time.append(art := sum(jobs_resp) / len(jobs_resp))
+        print(f"average response time: {art}")
+        writer.add_text(name, f"average response time: {art}")
+
+    plt.figure(figsize=(10, 5))
+    plt.clf()
+    plt.subplot(121)
+    plt.title("Cost")
+    plt.bar(agent_names, cost)
+    plt.subplot(122)
+    plt.title("Average Response Time")
+    plt.bar(agent_names, average_response_time)
+    plt.tight_layout()
+    writer.add_figure("Evaluation", plt.gcf())
+
+    writer.flush()
+    writer.close()
