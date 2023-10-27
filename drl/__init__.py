@@ -5,20 +5,24 @@ from collections import namedtuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchrl.modules import NoisyLinear
 
 
 class DQN(nn.Module):
-    # TODO: 改用噪声网络
     def __init__(self, state_dim: int, action_dim: int) -> None:
         super().__init__()
 
         self.fc1 = nn.Linear(in_features=state_dim, out_features=64)
-        self.fc2 = nn.Linear(in_features=64, out_features=64)
+        self.fc2 = NoisyLinear(in_features=64, out_features=128)
+        self.fc3 = NoisyLinear(in_features=128, out_features=128)
+        self.fc4 = NoisyLinear(in_features=128, out_features=64)
         self.out = nn.Linear(in_features=64, out_features=action_dim)
 
     def forward(self, t: torch.Tensor) -> torch.Tensor:
         t = F.relu(self.fc1(t))
         t = F.relu(self.fc2(t))
+        t = F.relu(self.fc3(t))
+        t = F.relu(self.fc4(t))
         t = self.out(t)
         return t
 
