@@ -1,3 +1,5 @@
+import datetime
+import os
 from itertools import count
 
 import torch
@@ -19,6 +21,7 @@ from environment import Environment
 from utils import load_hyperparameters
 
 if __name__ == "__main__":
+    now = datetime.datetime.now().strftime("%b%d_%H-%M-%S")
     hyperparameters = load_hyperparameters()
     use_mask = hyperparameters["use_mask"]
     batch_size = hyperparameters["batch_size"]
@@ -98,3 +101,13 @@ if __name__ == "__main__":
         if episode % target_update == 0:
             # 更新 target_net 参数
             target_net.load_state_dict(policy_net.state_dict())
+
+    writer.flush()
+    writer.close()
+
+    # 保存模型
+    models_dir = os.path.join(os.getcwd(), "models")
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+    torch.save(policy_net.state_dict(), os.path.join(models_dir, f"{now}.pth"))
+    print(f"Model saved at: {models_dir}")

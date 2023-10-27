@@ -167,3 +167,6 @@ test.py
 
 # Tensorboard log dir
 runs/
+
+# models dir
+models/
