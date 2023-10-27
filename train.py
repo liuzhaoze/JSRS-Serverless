@@ -23,6 +23,8 @@ from utils import load_hyperparameters
 
 if __name__ == "__main__":
     now = datetime.datetime.now().strftime("%b%d_%H-%M-%S")
+    writer = SummaryWriter()
+
     hyperparameters = load_hyperparameters()
     use_mask = hyperparameters["use_mask"]
     batch_size = hyperparameters["batch_size"]
@@ -37,13 +39,15 @@ if __name__ == "__main__":
     num_episodes = hyperparameters["num_episodes"]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    writer = SummaryWriter()
     env = Environment(use_mask, device)
     env.reset()  # 必须 reset 之后才能加载实例配置，env.action_dim() 才能返回正确的值
     epsilon_greedy = EpsilonGreedyStrategy(epsilon_start, epsilon_end, epsilon_decay)
     drl_agent = DRLAgent(epsilon_greedy, env.action_dim(), device)
     memory = ReplayMemory(replay_memory_size)
 
+    writer.add_graph(
+        DQN(env.state_dim(), env.action_dim()).to(device), env.get_state()[0]
+    )
     policy_net = DQN(env.state_dim(), env.action_dim()).to(device)
     target_net = DQN(env.state_dim(), env.action_dim()).to(device)
     target_net.load_state_dict(policy_net.state_dict())
