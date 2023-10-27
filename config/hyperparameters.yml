@@ -16,6 +16,7 @@ job_length_distribution:
 moldable_job_ratio: 0.5 # Moldable 类型的任务占全部任务的比例
 
 # 深度强化学习 DQN 超参数
+use_mask: False # 是否使用 mask 屏蔽不可用 action
 batch_size: 256 # 单次更新 DQN 的样本数量
 gamma: 0.99 # 回报 return 中的折扣因子
 epsilon_start: 1.0 # ε-greedy 算法中 ε 的初始值

@@ -14,7 +14,8 @@ from .speedup_model import SpeedupModel
 
 
 class Environment:
-    def __init__(self, device: torch.device) -> None:
+    def __init__(self, use_mask: bool, device: torch.device) -> None:
+        self.use_mask = use_mask
         self.device = device
 
         # 设置超参数
@@ -172,7 +173,7 @@ class Environment:
     def state_dim(self) -> int:
         return 4 + len(self.instances)
 
-    def get_state(self) -> torch.Tensor:
+    def get_state(self) -> (torch.Tensor, torch.Tensor):
         """
         状态向量的组成：
         1. 当前任务的所需CPU数
@@ -183,10 +184,12 @@ class Environment:
         """
         if self.done():
             # episode 结束时的状态为全零向量
-            return torch.zeros(self.state_dim(), device=self.device).float()
+            return torch.zeros(self.state_dim(), device=self.device).float(), None
 
         current_job_id = self.__glimpse_job_id()
         current_job = self.jobs[current_job_id]
+
+        # 生成状态向量
         state = [
             current_job.required_cpu,
             current_job.required_memory,
@@ -196,7 +199,20 @@ class Environment:
         for instance in self.instances:
             state.append(max(instance.idle_time - current_job.submit_time, 0))
 
-        return torch.tensor(state, device=self.device).float()
+        # 生成掩码向量
+        if self.use_mask:
+            mask = torch.tensor(
+                [
+                    not Environment.invalid(instance, current_job)
+                    for instance in self.instances
+                ],
+                dtype=torch.bool,
+                device=self.device,
+            )
+        else:
+            mask = torch.ones(self.action_dim(), dtype=torch.bool, device=self.device)
+
+        return torch.tensor(state, device=self.device).float(), mask
 
     def action_dim(self) -> int:
         return len(self.instances)
@@ -207,10 +223,7 @@ class Environment:
         target_instance = self.instances[action]
 
         # 计算 reward
-        if (current_job.required_memory > target_instance.memory) or (
-            current_job.job_type == JobType.rigid
-            and current_job.required_cpu > target_instance.vCPU
-        ):
+        if Environment.invalid(target_instance, current_job):
             updated_instance, updated_job = target_instance, current_job
             reward = -100
             # 更新评价指标
@@ -243,6 +256,12 @@ class Environment:
             self.__submit_job(updated_job)
 
         return torch.tensor([reward], device=self.device).float()
+
+    @staticmethod
+    def invalid(instance: Instance, job: Job) -> bool:
+        return (job.required_memory > instance.memory) or (
+            job.job_type == JobType.rigid and job.required_cpu > instance.vCPU
+        )
 
     @staticmethod
     def load_time(instance: Instance, job: Job) -> float:
@@ -287,10 +306,8 @@ class Environment:
 
     @staticmethod
     def assign(instance: Instance, job: Job) -> (Instance, Job, AssignResult):
-        if job.required_memory > instance.memory:
-            raise RuntimeError("Memory is not enough.")
-        if job.job_type == JobType.rigid and job.required_cpu > instance.vCPU:
-            raise RuntimeError("CPU is not enough.")
+        if Environment.invalid(instance, job):
+            raise RuntimeError("Invalid assignment.")
 
         t_submit = job.submit_time  # 作为返回值记录
 
