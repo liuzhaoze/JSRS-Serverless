@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 from itertools import count
 
 import torch
@@ -109,5 +110,8 @@ if __name__ == "__main__":
     models_dir = os.path.join(os.getcwd(), "models")
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
-    torch.save(policy_net.state_dict(), os.path.join(models_dir, f"{now}.pth"))
+    torch.save(
+        policy_net.state_dict(),
+        os.path.join(models_dir, f"{sys.argv[1] if len(sys.argv) == 2 else now}.pth"),
+    )
     print(f"Model saved at: {models_dir}")
