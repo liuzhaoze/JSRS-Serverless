@@ -8,7 +8,7 @@ class AgentBase:
         self.action_dim = action_dim
         self.device = device
 
-    def select_action(self, mask: torch.Tensor) -> torch.Tensor:
+    def select_action(self, mask: torch.Tensor, *args) -> torch.Tensor:
         raise NotImplementedError
 
 
@@ -44,7 +44,7 @@ class RandomAgent(AgentBase):
     def __init__(self, action_dim: int, device: torch.Tensor) -> None:
         super().__init__(action_dim, device)
 
-    def select_action(self, mask: torch.Tensor) -> torch.Tensor:
+    def select_action(self, mask: torch.Tensor, *args) -> torch.Tensor:
         return random.choice(mask.nonzero()).to(self.device)
 
 
@@ -54,7 +54,7 @@ class RoundRobinAgent(AgentBase):
 
         self.step_count = -1
 
-    def select_action(self) -> torch.Tensor:
+    def select_action(self, mask: torch.Tensor, *args) -> torch.Tensor:
         self.step_count += 1
         return torch.tensor([self.step_count % self.action_dim], device=self.device)
 
@@ -63,6 +63,8 @@ class EarliestAgent(AgentBase):
     def __init__(self, action_dim: int, device: torch.Tensor) -> None:
         super().__init__(action_dim, device)
 
-    def select_action(self, mask: torch.Tensor, state: torch.Tensor) -> torch.Tensor:
+    def select_action(
+        self, mask: torch.Tensor, state: torch.Tensor, *args
+    ) -> torch.Tensor:
         wait_time = state[4:].where(mask, float("inf"))
         return wait_time.unsqueeze(dim=0).argmin(dim=1).to(self.device)
