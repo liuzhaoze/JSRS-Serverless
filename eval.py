@@ -9,7 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 from agent import DRLAgent, EarliestAgent, RandomAgent, RoundRobinAgent
 from drl import DQN, EpsilonGreedyStrategy
 from environment import Environment
-from utils import load_hyperparameters
+from utils import load_hyperparameters, set_seed
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -17,6 +17,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     hyperparameters = load_hyperparameters()
+    reproducibility = hyperparameters["reproducibility_eval"]
+    seed = hyperparameters["seed_eval"]
+    set_seed(reproducibility, seed)
     use_mask = hyperparameters["use_mask"]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

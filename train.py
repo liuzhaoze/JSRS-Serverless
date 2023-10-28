@@ -19,13 +19,16 @@ from drl import (
     extract_tensors,
 )
 from environment import Environment
-from utils import load_hyperparameters
+from utils import load_hyperparameters, set_seed
 
 if __name__ == "__main__":
     now = datetime.datetime.now().strftime("%b%d_%H-%M-%S")
     writer = SummaryWriter()
 
     hyperparameters = load_hyperparameters()
+    reproducibility = hyperparameters["reproducibility_train"]
+    seed = hyperparameters["seed_train"]
+    set_seed(reproducibility, seed)
     use_mask = hyperparameters["use_mask"]
     batch_size = hyperparameters["batch_size"]
     gamma = hyperparameters["gamma"]
