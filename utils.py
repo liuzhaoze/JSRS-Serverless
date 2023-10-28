@@ -29,29 +29,24 @@ def load_hyperparameters():
     return hyperparameters
 
 
-def set_seed(reproducibility: bool, seed) -> tuple:
-    if type(seed) == int:
-        seed = [seed] * 5
-
-    # 必须指定 random 模块的种子，因为无法获得 random 模块当前使用的种子
-    random.seed(seed[0])
-
+def set_seed(reproducibility: bool, seed: dict) -> dict:
     if reproducibility:
-        np.random.seed(seed[1])
-        torch.manual_seed(seed[2])
-        torch.cuda.manual_seed(seed[3])
-        torch.cuda.manual_seed_all(seed[4])
+        random.setstate(eval(seed["random"]))
+        np.random.seed(seed["numpy"])
+        torch.manual_seed(seed["torch"])
+        torch.cuda.manual_seed(seed["torch_cuda"])
+        torch.cuda.manual_seed_all(seed["torch_cuda_all"])
 
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
-    return (
-        seed[0],
-        np.random.get_state()[1][0],
-        torch.initial_seed(),
-        torch.cuda.initial_seed(),
-        seed[4],
-    )
+    return {
+        "random": random.getstate(),
+        "numpy": np.random.get_state()[1][0],
+        "torch": torch.initial_seed(),
+        "torch_cuda": torch.cuda.initial_seed(),
+        "torch_cuda_all": torch.cuda.get_rng_state_all(),
+    }
 
 
 if __name__ == "__main__":
