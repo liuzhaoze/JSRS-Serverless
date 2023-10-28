@@ -29,24 +29,20 @@ def load_hyperparameters():
     return hyperparameters
 
 
-def set_seed(reproducibility: bool, seed: dict) -> dict:
+def set_seed(reproducibility: bool, seed: int):
     if reproducibility:
-        random.setstate(eval(seed["random"]))
-        np.random.seed(seed["numpy"])
-        torch.manual_seed(seed["torch"])
-        torch.cuda.manual_seed(seed["torch_cuda"])
-        torch.cuda.manual_seed_all(seed["torch_cuda_all"])
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
 
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
-    return {
-        "random": random.getstate(),
-        "numpy": np.random.get_state()[1][0],
-        "torch": torch.initial_seed(),
-        "torch_cuda": torch.cuda.initial_seed(),
-        "torch_cuda_all": torch.cuda.get_rng_state_all(),
-    }
+        return seed
+
+    return None
 
 
 if __name__ == "__main__":

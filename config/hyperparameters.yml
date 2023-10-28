@@ -1,3 +1,9 @@
+# 可复现性
+reproducibility_train: True
+seed_train: 0
+reproducibility_eval: True
+seed_eval: 0
+
 # 实例
 load_speed: 81.27     # 加载速度 任务从硬盘加载到内存的速度 MB/s
 suspend_speed: 63.67  # 挂起速度 任务从内存挂起到硬盘的速度 MB/s
@@ -27,19 +33,3 @@ replay_memory_size: 1000000  # 经验回放池的大小 通常为 10^5 ~ 10^6
 dqn_update_threshold: 10000  # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
 learning_rate: 0.001         # DQN 的学习率
 num_episodes: 1000            # 训练的轮数
-
-# 可复现性
-reproducibility_train: False
-reproducibility_eval: False
-seed_train:
-  random: 0
-  numpy: 0
-  torch: 0
-  torch_cuda: 0
-  torch_cuda_all: 0
-seed_eval:
-  random: 0
-  numpy: 0
-  torch: 0
-  torch_cuda: 0
-  torch_cuda_all: 0
