@@ -28,7 +28,7 @@ if __name__ == "__main__":
     hyperparameters = load_hyperparameters()
     reproducibility = hyperparameters["reproducibility_train"]
     seed = hyperparameters["seed_train"]
-    set_seed(reproducibility, seed)
+    writer.add_text("TrainSeeds", str(set_seed(reproducibility, seed)))
     use_mask = hyperparameters["use_mask"]
     batch_size = hyperparameters["batch_size"]
     gamma = hyperparameters["gamma"]

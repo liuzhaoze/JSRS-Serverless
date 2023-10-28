@@ -29,7 +29,7 @@ def load_hyperparameters():
     return hyperparameters
 
 
-def set_seed(reproducibility: bool, seed):
+def set_seed(reproducibility: bool, seed) -> tuple:
     if type(seed) == int:
         seed = [seed] * 5
 
@@ -45,11 +45,13 @@ def set_seed(reproducibility: bool, seed):
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
-    print("Using seed:")
-    print(f"\trandom.seed: {seed[0]}")
-    print(f"\tnp.random.seed: {np.random.get_state()[1][0]}")
-    print(f"\ttorch.manual_seed: {torch.initial_seed()}")
-    print(f"\ttorch.cuda.manual_seed: {torch.cuda.initial_seed()}")
+    return (
+        seed[0],
+        np.random.get_state()[1][0],
+        torch.initial_seed(),
+        torch.cuda.initial_seed(),
+        seed[4],
+    )
 
 
 if __name__ == "__main__":

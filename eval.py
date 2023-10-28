@@ -16,14 +16,15 @@ if __name__ == "__main__":
         print("python eval.py <model_path>")
         sys.exit(1)
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    writer = SummaryWriter()
+
     hyperparameters = load_hyperparameters()
     reproducibility = hyperparameters["reproducibility_eval"]
     seed = hyperparameters["seed_eval"]
-    set_seed(reproducibility, seed)
+    writer.add_text("EvalSeeds", str(set_seed(reproducibility, seed)))
     use_mask = hyperparameters["use_mask"]
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    writer = SummaryWriter()
     env = Environment(use_mask, device)
     env.reset()
 
@@ -62,12 +63,12 @@ if __name__ == "__main__":
 
         cost.append(c := env.get_total_cost())
         print(f"cost: {c}")
-        writer.add_text(name, f"cost: {c}")
+        writer.add_text("EvalResults", f"{name} | cost: {c}")
 
         jobs_resp = env.get_jobs_response_time()
         average_response_time.append(art := sum(jobs_resp) / len(jobs_resp))
         print(f"average response time: {art}")
-        writer.add_text(name, f"average response time: {art}")
+        writer.add_text("EvalResults", f"{name} | average response time: {art}")
 
     plt.figure(figsize=(10, 5))
     plt.clf()
