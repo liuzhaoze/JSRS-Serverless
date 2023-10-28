@@ -17,8 +17,8 @@ sigma: 0.0
 job_number: 100
 submit_speed: 20           # 任务提交速度 在一个小时内提交的任务数量 即任务提交间隔分布中的 lambda
 job_length_distribution:
-  name: uniform            # 均匀分布 uniform 正态分布 normal
-  parameters: [0.5, 2]     # 任务长度分布的参数 均匀分布 [min, max] 正态分布 [mean, std]
+  name: normal            # 均匀分布 uniform 正态分布 normal
+  parameters: [1.5, 0.1]     # 任务长度分布的参数 均匀分布 [min, max] 正态分布 [mean, std]
 moldable_job_ratio: 0.5    # Moldable 类型的任务占全部任务的比例
 
 # 深度强化学习 DQN 超参数
@@ -32,4 +32,4 @@ target_update: 10            # target Q net 的更新频率 每几个 episode �
 replay_memory_size: 1000000  # 经验回放池的大小 通常为 10^5 ~ 10^6
 dqn_update_threshold: 10000  # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
 learning_rate: 0.001         # DQN 的学习率
-num_episodes: 500            # 训练的轮数
+num_episodes: 1000            # 训练的轮数
