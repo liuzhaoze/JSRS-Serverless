@@ -1,8 +1,11 @@
 # 可复现性
 reproducibility_train: False
-seed_train: 0
+seed_train: 114514
 reproducibility_eval: False
-seed_eval: 0
+seed_eval: 114514
+# 需要 seed 的模块 [random.seed, np.random.seed, torch.manual_seed, torch.cuda.manual_seed, torch.cuda.manual_seed_all]
+# seed 为整数时，五个模块的 seed 都为该整数
+# seed 为列表时，五个模块的 seed 分别为列表中的五个整数
 
 # 实例
 load_speed: 81.27     # 加载速度 任务从硬盘加载到内存的速度 MB/s
