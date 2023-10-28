@@ -171,17 +171,9 @@ class Environment:
         return str(self.submit_queue.queue) + "\n"
 
     def state_dim(self) -> int:
-        return 4 + len(self.instances)
+        return 4 + 2 * len(self.instances)
 
     def get_state(self) -> (torch.Tensor, torch.Tensor):
-        """
-        状态向量的组成：
-        1. 当前任务的所需CPU数
-        2. 当前任务的所需内存
-        3. 当前任务的类型
-        4. 当前任务的上一次执行所在区域
-        5- 当前任务分配到每个实例上需要等待的时间
-        """
         if self.done():
             # episode 结束时的状态为全零向量，掩码向量为全假向量
             s = torch.zeros(self.state_dim(), device=self.device).float()
@@ -195,13 +187,16 @@ class Environment:
         # NOTE: 需要同步修改 Environment state_dim 函数
         # NOTE: 需要同步修改 agent.EarliestAgent select_action 函数
         state = [
-            current_job.required_cpu,
-            current_job.required_memory,
-            current_job.job_type.value,
-            current_job.last_zone.value,
+            current_job.required_cpu,  # 当前任务的所需 CPU 数
+            current_job.required_memory,  # 当前任务的所需内存
+            current_job.job_type.value,  # 当前任务的类型
+            current_job.last_zone.value,  # 当前任务的上一次执行所在区域
         ]
         for instance in self.instances:
-            state.append(max(instance.idle_time - current_job.submit_time, 0))
+            state.append(
+                max(instance.idle_time - current_job.submit_time, 0)
+            )  # 当前任务分配到每个实例上需要等待的时间
+            state.append(instance.remaining_lease_term)  # 每个实例的剩余租期
 
         # 生成掩码向量
         if self.use_mask:

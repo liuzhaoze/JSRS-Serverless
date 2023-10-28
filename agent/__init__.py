@@ -66,5 +66,5 @@ class EarliestAgent(AgentBase):
     def select_action(
         self, mask: torch.Tensor, state: torch.Tensor, *args
     ) -> torch.Tensor:
-        wait_time = state[4:].where(mask, float("inf"))
+        wait_time = state[4::2].where(mask, float("inf"))
         return wait_time.unsqueeze(dim=0).argmin(dim=1).to(self.device)
