@@ -13,6 +13,8 @@ if __name__ == "__main__":
         plt.title(f"{zone.name} {instance_type.name}")
         plt.xlabel("Time")
         plt.ylabel("Price")
+        if zone == Zone.no_record:
+            continue
         plt.plot(spot["t2"][zone.name][instance_type.name]["price"])
         plt.axhline(
             y=on_demand["t2"][instance_type.name]["price"], color="r", linestyle="--"
