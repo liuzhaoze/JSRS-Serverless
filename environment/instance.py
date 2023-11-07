@@ -6,13 +6,12 @@ from utils import load_data, load_hyperparameters
 
 
 class InstanceType(Enum):
-    nano = 0
-    micro = 1
-    small = 2
-    medium = 3
-    large = 4
-    xlarge = 5
-    xxlarge = 6
+    micro = 0
+    small = 1
+    medium = 2
+    large = 3
+    xlarge = 4
+    xxlarge = 5
 
 
 class Zone(Enum):
