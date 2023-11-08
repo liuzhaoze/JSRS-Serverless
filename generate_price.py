@@ -12,9 +12,13 @@ on_demand, _ = load_data()
 instances_of_each_region = on_demand["t2"]
 
 for it in InstanceType:
-    mu = instances_of_each_region[it.name]["price"] * 0.9
+    on_demand_price = instances_of_each_region[it.name]["price"]
+    mu = 0.9 * on_demand_price
     sigma = mu * 0.1
-    spot_price = [round(x, 4) for x in np.random.normal(mu, sigma, length)]
+    spot_price = [
+        max(round(x, 4), 0.85 * on_demand_price)
+        for x in np.random.normal(mu, sigma, length)
+    ]
     instances_of_each_region[it.name]["price"] = spot_price
 
 spot = {"t2": {}}
