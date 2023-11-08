@@ -13,6 +13,7 @@ from environment import (
     Zone,
 )
 from environment.speedup_model import SpeedupModel
+from utils import set_seed
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -185,3 +186,33 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #         torch.tensor([1, 2, 3, 4, 8, 10, 7], device=device),
 #     )
 # )
+
+###########################################################################
+
+# 深拷贝环境测试
+
+# import copy
+
+# set_seed(True, 0)
+# env = Environment(True, device)
+# env.reset()
+# print(env.jobs_info())
+# print(env.instances_info())
+# print(env.queue_info())
+
+# another_env = copy.deepcopy(env)
+# print(another_env.jobs_info())
+# print(another_env.instances_info())
+# print(another_env.queue_info())
+
+# env.take_action(0)
+# print(env.jobs_info())
+# print(env.instances_info())
+# print(env.queue_info())
+# print(env.get_success_rate())
+
+# another_env.take_action(3)
+# print(another_env.jobs_info())
+# print(another_env.instances_info())
+# print(another_env.queue_info())
+# print(another_env.get_success_rate())

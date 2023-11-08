@@ -1,3 +1,4 @@
+import copy
 import os
 from collections import namedtuple
 from queue import PriorityQueue
@@ -145,6 +146,21 @@ class Environment:
         self.__load_instances_config()
         self.__generate_workload()
         self.__init_queue()
+
+    def __deepcopy__(self, memo) -> "Environment":
+        copied = Environment(self.use_mask, self.device)
+
+        copied.instances = copy.deepcopy(self.instances)
+        copied.jobs = copy.deepcopy(self.jobs)
+        copied.total_cost = copy.deepcopy(self.total_cost)
+        copied.success_count = copy.deepcopy(self.success_count)
+        copied.fail_count = copy.deepcopy(self.fail_count)
+
+        with copied.submit_queue.mutex:
+            copied.submit_queue.queue.clear()
+        copied.__init_queue()
+
+        return copied
 
     def done(self) -> bool:
         return self.submit_queue.empty()
