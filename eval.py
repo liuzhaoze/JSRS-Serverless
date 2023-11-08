@@ -1,3 +1,4 @@
+import copy
 import os
 import sys
 from itertools import count
@@ -47,25 +48,25 @@ if __name__ == "__main__":
 
     for name, agent in zip(agent_names, agents):
         # 开始评估
-        env.reset()
-        state, mask = env.get_state()
+        env_eval = copy.deepcopy(env)  # 所有评估使用同一个环境
+        state, mask = env_eval.get_state()
 
         for step in count():
             action = agent.select_action(mask, state, policy_net)
-            reward = env.take_action(action.item())
-            next_state, next_mask = env.get_state()
+            reward = env_eval.take_action(action.item())
+            next_state, next_mask = env_eval.get_state()
             state, mask = next_state, next_mask
 
-            if env.done():
+            if env_eval.done():
                 break
 
         print(f"agent: {name}")
 
-        cost.append(c := env.get_total_cost())
+        cost.append(c := env_eval.get_total_cost())
         print(f"cost: {c}")
         writer.add_text("EvalResults", f"{name} | cost: {c}")
 
-        jobs_resp = env.get_jobs_response_time()
+        jobs_resp = env_eval.get_jobs_response_time()
         average_response_time.append(art := sum(jobs_resp) / len(jobs_resp))
         print(f"average response time: {art}")
         writer.add_text("EvalResults", f"{name} | average response time: {art}")
