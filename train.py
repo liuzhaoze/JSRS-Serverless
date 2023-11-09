@@ -39,7 +39,7 @@ if __name__ == "__main__":
     replay_memory_size = hyperparameters["replay_memory_size"]
     dqn_update_threshold = hyperparameters["dqn_update_threshold"]
     learning_rate = hyperparameters["learning_rate"]
-    num_episodes = hyperparameters["num_episodes"]
+    num_episodes = hyperparameters["train_episodes"]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     env = Environment(use_mask, device)

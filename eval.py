@@ -6,6 +6,7 @@ from itertools import count
 import matplotlib.pyplot as plt
 import torch
 from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 from agent import DRLAgent, EarliestAgent, RandomAgent, RoundRobinAgent
 from drl import DQN, EpsilonGreedyStrategy
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     seed = hyperparameters["seed_eval"]
     writer.add_text("EvalSeeds", str(set_seed(reproducibility, seed)))
     use_mask = hyperparameters["use_mask"]
+    num_episodes = hyperparameters["eval_episodes"]
 
     env = Environment(use_mask, device)
     env.reset()
@@ -43,42 +45,45 @@ if __name__ == "__main__":
 
     agent_names = ["drl", "random", "round_robin", "earliest"]
     agents = [drl_agent, random_agent, rr_agent, earliest_agent]
-    cost = []
-    average_response_time = []
+    cost = {name: [] for name in agent_names}
+    average_response_time = {name: [] for name in agent_names}
 
-    for name, agent in zip(agent_names, agents):
-        # 开始评估
-        env_eval = copy.deepcopy(env)  # 所有评估使用同一个环境
-        state, mask = env_eval.get_state()
+    for episode in tqdm(range(num_episodes)):
+        env.reset()
 
-        for step in count():
-            action = agent.select_action(mask, state, policy_net)
-            reward = env_eval.take_action(action.item())
-            next_state, next_mask = env_eval.get_state()
-            state, mask = next_state, next_mask
+        for name, agent in zip(agent_names, agents):
+            # 开始评估
+            env_eval = copy.deepcopy(env)  # 所有评估使用同一个环境
+            state, mask = env_eval.get_state()
 
-            if env_eval.done():
-                break
+            for step in count():
+                action = agent.select_action(mask, state, policy_net)
+                reward = env_eval.take_action(action.item())
+                next_state, next_mask = env_eval.get_state()
+                state, mask = next_state, next_mask
 
-        print(f"agent: {name}")
+                if env_eval.done():
+                    break
 
-        cost.append(c := env_eval.get_total_cost())
-        print(f"cost: {c}")
-        writer.add_text("EvalResults", f"{name} | cost: {c}")
+            cost[name].append(env_eval.get_total_cost())
+            jobs_resp = env_eval.get_jobs_response_time()
+            average_response_time[name].append(sum(jobs_resp) / len(jobs_resp))
 
-        jobs_resp = env_eval.get_jobs_response_time()
-        average_response_time.append(art := sum(jobs_resp) / len(jobs_resp))
-        print(f"average response time: {art}")
-        writer.add_text("EvalResults", f"{name} | average response time: {art}")
+    writer.add_text("EvalResults/Cost", str(cost))
+    writer.add_text("EvalResults/AverageResponseTime", str(average_response_time))
 
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(20, 5))
     plt.clf()
     plt.subplot(121)
     plt.title("Cost")
-    plt.bar(agent_names, cost)
+    for name, c in cost.items():
+        plt.plot(c, label=name)
+    plt.legend()
     plt.subplot(122)
     plt.title("Average Response Time")
-    plt.bar(agent_names, average_response_time)
+    for name, art in average_response_time.items():
+        plt.plot(art, label=name)
+    plt.legend()
     plt.tight_layout()
     writer.add_figure("Evaluation", plt.gcf())
 
