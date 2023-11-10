@@ -1,5 +1,5 @@
 # 可复现性
-reproducibility_train: True
+reproducibility_train: False
 seed_train: 0
 reproducibility_eval: False
 seed_eval: 0
