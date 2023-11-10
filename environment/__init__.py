@@ -255,9 +255,7 @@ class Environment:
                 updated_job.finished(),
             )
             reward = (
-                (1 + np.exp(1.5 - result.cost))
-                * (result.end_time - result.start_time)
-                / (result.end_time - result.submit_time)
+                -1 - 1.0 * result.cost - 5.0 * (result.end_time - result.submit_time)
             )
             # 更新评价指标
             self.success_count += 1
