@@ -69,7 +69,7 @@ class Environment:
         required_cpus = np.random.randint(1, self.__max_cpu() + 1, self.n_jobs)
 
         # 生成任务所需内存
-        required_memories = np.random.uniform(100.0, self.__max_memory(), self.n_jobs)
+        required_memories = np.random.uniform(100.0, 150.0, self.n_jobs)
 
         # 生成任务长度（ clip 防止随机生成的任务长度出现负数）
         match self.job_length_distribution["name"]:

@@ -1,8 +1,8 @@
 # 可复现性
-reproducibility_train: False
-seed_train: 0
-reproducibility_eval: False
-seed_eval: 0
+reproducibility_train: True
+seed_train: 114514
+reproducibility_eval: True
+seed_eval: 114514
 
 # 实例
 load_speed: 81.27     # 加载速度 任务从硬盘加载到内存的速度 MB/s
@@ -19,7 +19,7 @@ submit_speed: 20           # 任务提交速度 在一个小时内提交的任�
 job_length_distribution:
   name: normal            # 均匀分布 uniform 正态分布 normal
   parameters: [1.5, 0.1]     # 任务长度分布的参数 均匀分布 [min, max] 正态分布 [mean, std]
-job_length_lower_bound: 0.1  # 任务长度的下界
+job_length_lower_bound: 0.01  # 任务长度的下界
 moldable_job_ratio: 0.5    # Moldable 类型的任务占全部任务的比例
 
 # 深度强化学习 DQN 超参数
@@ -31,7 +31,7 @@ epsilon_end: 0.01            # ε-greedy 算法中 ε 的最终值
 epsilon_decay: 0.001         # ε-greedy 算法中 ε 的衰减速率
 target_update: 10            # target Q net 的更新频率 每几个 episode 更新一次
 replay_memory_size: 1000000  # 经验回放池的大小 通常为 10^5 ~ 10^6
-dqn_update_threshold: 10000  # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
+dqn_update_threshold: 0  # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
 learning_rate: 0.001         # DQN 的学习率
 train_episodes: 400          # 训练的轮数
 
