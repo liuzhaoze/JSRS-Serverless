@@ -52,11 +52,11 @@ class RoundRobinAgent(AgentBase):
     def __init__(self, action_dim: int, device: torch.Tensor) -> None:
         super().__init__(action_dim, device)
 
-        self.step_count = -1
+        self.current_action = -1
 
     def select_action(self, mask: torch.Tensor, *args) -> torch.Tensor:
-        self.step_count += 1
-        return torch.tensor([self.step_count % self.action_dim], device=self.device)
+        self.current_action = (self.current_action + 1) % self.action_dim
+        return torch.tensor([self.current_action], device=self.device)
 
 
 class EarliestAgent(AgentBase):
