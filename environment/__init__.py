@@ -24,6 +24,7 @@ class Environment:
         self.n_jobs = hyperparameters["job_number"]
         self.submit_speed = hyperparameters["submit_speed"]
         self.job_length_distribution = hyperparameters["job_length_distribution"]
+        self.job_length_lower_bound = hyperparameters["job_length_lower_bound"]
         self.moldable_job_ratio = hyperparameters["moldable_job_ratio"]
 
         # 环境状态
@@ -70,20 +71,20 @@ class Environment:
         # 生成任务所需内存
         required_memories = np.random.uniform(100.0, self.__max_memory(), self.n_jobs)
 
-        # 生成任务长度
+        # 生成任务长度（ clip 防止随机生成的任务长度出现负数）
         match self.job_length_distribution["name"]:
             case "uniform":
                 job_lengths = np.random.uniform(
                     self.job_length_distribution["parameters"][0],
                     self.job_length_distribution["parameters"][1],
                     self.n_jobs,
-                )
+                ).clip(self.job_length_lower_bound)
             case "normal":
                 job_lengths = np.random.normal(
                     self.job_length_distribution["parameters"][0],
                     self.job_length_distribution["parameters"][1],
                     self.n_jobs,
-                )
+                ).clip(self.job_length_lower_bound)
             case _:
                 raise ValueError(
                     f"Unknown job length distribution: {self.job_length_distribution['name']}"
