@@ -322,6 +322,10 @@ class Environment:
         if Environment.invalid(instance, job):
             raise RuntimeError("Invalid assignment.")
 
+        # 记录调度前的状态
+        job_status_before = str(job)
+        instance_status_before = str(instance)
+
         t_submit = job.submit_time  # 作为返回值记录
 
         # 在实例空闲后提交任务，产生时间浪费
@@ -372,10 +376,18 @@ class Environment:
             job.last_zone = instance.zone
             job.submit_time = instance.idle_time
 
+        # 记录调度后的状态
+        job_status_after = str(job)
+        instance_status_after = str(instance)
+
         if not 0 < t_submit < t_begin < t_end:
-            raise RuntimeError(
-                f"Time error.\n{t_submit} {t_begin} {t_end}\n{job}\n{instance}"
-            )
+            error_msg = "Time error.\n"
+            error_msg += f"{t_submit=:.4f} {t_begin=:.4f} {t_end=:.4f}\n"
+            error_msg += "-" * 40 + " before " + "-" * 40 + "\n"
+            error_msg += job_status_before + "\n" + instance_status_before + "\n"
+            error_msg += "-" * 40 + " after " + "-" * 40 + "\n"
+            error_msg += job_status_after + "\n" + instance_status_after + "\n"
+            raise RuntimeError(error_msg)
 
         return (
             instance,
