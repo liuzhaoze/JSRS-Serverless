@@ -115,10 +115,9 @@ if __name__ == "__main__":
 
     # 保存模型
     models_dir = os.path.join(os.getcwd(), "models")
+    model_name = f"{sys.argv[1] if len(sys.argv) == 2 else now}.pth"
+    model_path = os.path.join(models_dir, model_name)
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
-    torch.save(
-        policy_net.state_dict(),
-        os.path.join(models_dir, f"{sys.argv[1] if len(sys.argv) == 2 else now}.pth"),
-    )
-    print(f"Model saved at: {models_dir}")
+    torch.save(policy_net.state_dict(), model_path)
+    print(f"Model saved at: {model_path}")
