@@ -33,7 +33,7 @@ target_update: 10            # target Q net 的更新频率 每几个 episode �
 replay_memory_size: 1000000  # 经验回放池的大小 通常为 10^5 ~ 10^6
 dqn_update_threshold: 10000  # 控制当 Replay Memory 中的经验数量达到多少时，才开始训练 DQN
 learning_rate: 0.001         # DQN 的学习率
-train_episodes: 1000         # 训练的轮数
+train_episodes: 400          # 训练的轮数
 
 # 评估参数
 eval_episodes: 15   # 评估的轮数
