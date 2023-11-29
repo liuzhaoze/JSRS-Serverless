@@ -47,6 +47,35 @@ def set_seed(reproducibility: bool, seed: int):
     return None
 
 
+def draw_gantt_chart(workload: list) -> None:
+    import plotly.graph_objs as go
+
+    traces = []
+
+    for job_id, job in enumerate(workload):
+        time_stamp = []
+        instance = []
+        for index, record in job.exec_history.iterrows():
+            time_stamp.append(record["submit_time"])
+            instance.append(record["instance_id"])
+            time_stamp.append(None)
+            instance.append(None)
+            time_stamp.append(record["start_time"])
+            instance.append(record["instance_id"])
+            time_stamp.append(record["end_time"])
+            instance.append(record["instance_id"])
+            time_stamp.append(None)
+            instance.append(None)
+
+        trace = go.Scatter(
+            x=time_stamp, y=instance, mode="lines+markers", name=f"Job {job_id}"
+        )
+        traces.append(trace)
+
+    fig = go.Figure(data=traces)
+    fig.show()
+
+
 def send_system_message(message: str):
     from windows_toasts import Toast, WindowsToaster
 
