@@ -77,12 +77,12 @@ if __name__ == "__main__":
     plt.subplot(121)
     plt.title("Cost")
     for name, c in cost.items():
-        plt.plot(c, label=name)
+        plt.plot(c, label=name, marker="o")
     plt.legend()
     plt.subplot(122)
     plt.title("Average Response Time")
     for name, art in average_response_time.items():
-        plt.plot(art, label=name)
+        plt.plot(art, label=name, marker="o")
     plt.legend()
     plt.tight_layout()
     writer.add_figure("Evaluation", plt.gcf())
