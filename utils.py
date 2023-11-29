@@ -47,7 +47,7 @@ def set_seed(reproducibility: bool, seed: int):
     return None
 
 
-def draw_gantt_chart(workload: list) -> None:
+def draw_gantt_chart(chart_name: str, workload: list) -> None:
     import plotly.graph_objs as go
 
     traces = []
@@ -73,6 +73,7 @@ def draw_gantt_chart(workload: list) -> None:
         traces.append(trace)
 
     fig = go.Figure(data=traces)
+    fig.update_layout(title=chart_name, xaxis_title="Time", yaxis_title="Instance ID")
     fig.show()
 
 
