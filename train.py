@@ -19,7 +19,7 @@ from drl import (
     extract_tensors,
 )
 from environment import Environment
-from utils import load_hyperparameters, set_seed
+from utils import load_hyperparameters, send_system_message, set_seed
 
 if __name__ == "__main__":
     now = datetime.datetime.now().strftime("%b%d_%H-%M-%S")
@@ -121,3 +121,5 @@ if __name__ == "__main__":
         os.makedirs(models_dir)
     torch.save(policy_net.state_dict(), model_path)
     print(f"Model saved at: {model_path}")
+
+    send_system_message("Training finished!")

@@ -47,5 +47,14 @@ def set_seed(reproducibility: bool, seed: int):
     return None
 
 
+def send_system_message(message: str):
+    from windows_toasts import Toast, WindowsToaster
+
+    toaster = WindowsToaster("Python")
+    newToast = Toast()
+    newToast.text_fields = [message, message]
+    toaster.show_toast(newToast)
+
+
 if __name__ == "__main__":
     print(load_hyperparameters())

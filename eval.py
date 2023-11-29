@@ -11,7 +11,7 @@ from tqdm import tqdm
 from agent import DRLAgent, EarliestAgent, RandomAgent, RoundRobinAgent
 from drl import DQN, EpsilonGreedyStrategy
 from environment import Environment
-from utils import load_hyperparameters, set_seed
+from utils import load_hyperparameters, send_system_message, set_seed
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -89,3 +89,5 @@ if __name__ == "__main__":
 
     writer.flush()
     writer.close()
+
+    send_system_message("Evaluation finished!")
