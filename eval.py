@@ -63,6 +63,7 @@ if __name__ == "__main__":
                 state, mask = next_state, next_mask
 
                 if env_eval.done():
+                    # draw_gantt_chart(f"episode {episode}: {name}", env_eval.jobs)
                     break
 
             cost[name].append(env_eval.get_total_cost())
