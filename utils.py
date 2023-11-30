@@ -73,7 +73,20 @@ def draw_gantt_chart(chart_name: str, workload: list) -> None:
         traces.append(trace)
 
     fig = go.Figure(data=traces)
-    fig.update_layout(title=chart_name, xaxis_title="Time", yaxis_title="Instance ID")
+    fig.update_layout(title=chart_name, xaxis_title="Time", yaxis_title="Instance Type")
+
+    # 设置纵坐标刻度
+    tick_vals = []
+    tick_text = []
+    cwd = os.getcwd()
+    config_path = os.path.join(cwd, "config", "instances.yml")
+    with open(config_path, "r") as f:
+        instances_config = yaml.load(f, Loader=yaml.FullLoader)
+    for instance_id, instance in enumerate(instances_config):
+        tick_vals.append(instance_id)
+        tick_text.append(instance["instance_type"])
+    fig.update_yaxes(tickvals=tick_vals, ticktext=tick_text)
+
     fig.show()
 
 
