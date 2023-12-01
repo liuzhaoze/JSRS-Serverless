@@ -84,7 +84,9 @@ def draw_gantt_chart(chart_name: str, workload: list) -> None:
         instances_config = yaml.load(f, Loader=yaml.FullLoader)
     for instance_id, instance in enumerate(instances_config):
         tick_vals.append(instance_id)
-        tick_text.append(instance["instance_type"])
+        tick_text.append(
+            instance["instance_type"] + " [" + instance["billing_type"] + "]"
+        )
     fig.update_yaxes(tickvals=tick_vals, ticktext=tick_text)
 
     fig.show()
