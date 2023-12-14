@@ -11,7 +11,7 @@ from tqdm import tqdm
 from agent import DRLAgent, EarliestAgent, RandomAgent, RoundRobinAgent
 from drl import DQN, EpsilonGreedyStrategy
 from environment import Environment
-from utils import load_hyperparameters, send_system_message, set_seed
+from utils import draw_gantt_chart, load_hyperparameters, send_system_message, set_seed
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -63,6 +63,7 @@ if __name__ == "__main__":
                 state, mask = next_state, next_mask
 
                 if env_eval.done():
+                    # draw_gantt_chart(f"episode {episode}: {name}", env_eval.jobs)
                     break
 
             cost[name].append(env_eval.get_total_cost())
@@ -77,12 +78,12 @@ if __name__ == "__main__":
     plt.subplot(121)
     plt.title("Cost")
     for name, c in cost.items():
-        plt.plot(c, label=name)
+        plt.plot(c, label=name, marker="o")
     plt.legend()
     plt.subplot(122)
     plt.title("Average Response Time")
     for name, art in average_response_time.items():
-        plt.plot(art, label=name)
+        plt.plot(art, label=name, marker="o")
     plt.legend()
     plt.tight_layout()
     writer.add_figure("Evaluation", plt.gcf())

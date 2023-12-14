@@ -1,39 +1,38 @@
-- instance_type: xxlarge
-  zone: us_east_1
-  billing_type: spot
-- instance_type: xlarge
-  zone: us_east_1
-  billing_type: spot
 - instance_type: large
   zone: us_east_1
-  billing_type: spot
-
-- instance_type: xxlarge
-  zone: us_east_2
-  billing_type: spot
-- instance_type: xlarge
-  zone: us_east_2
   billing_type: spot
 - instance_type: large
   zone: us_east_2
   billing_type: spot
-
-- instance_type: xxlarge
-  zone: us_west_1
-  billing_type: spot
-- instance_type: xlarge
-  zone: us_west_1
-  billing_type: spot
 - instance_type: large
   zone: us_west_1
   billing_type: spot
-
-- instance_type: xxlarge
+- instance_type: large
   zone: us_west_2
+  billing_type: spot
+
+- instance_type: xlarge
+  zone: us_east_1
+  billing_type: spot
+- instance_type: xlarge
+  zone: us_east_2
+  billing_type: spot
+- instance_type: xlarge
+  zone: us_west_1
   billing_type: spot
 - instance_type: xlarge
   zone: us_west_2
   billing_type: spot
-- instance_type: large
+
+- instance_type: xxlarge
+  zone: us_east_1
+  billing_type: spot
+- instance_type: xxlarge
+  zone: us_east_2
+  billing_type: spot
+- instance_type: xxlarge
+  zone: us_west_1
+  billing_type: spot
+- instance_type: xxlarge
   zone: us_west_2
   billing_type: spot

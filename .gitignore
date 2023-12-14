@@ -160,7 +160,8 @@ cython_debug/
 #.idea/
 
 # VSCode
-.vscode/
+.vscode/*
+!.vscode/settings.json
 
 # Tensorboard log dir
 runs/
