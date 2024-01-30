@@ -7,8 +7,8 @@ from .instance import Zone
 
 
 class JobType(Enum):
-    rigid = 0
-    moldable = 1
+    moldable = 0
+    rigid = 1
 
 
 class Job:
