@@ -10,8 +10,8 @@ suspend_speed: 63.67 # 挂起速度 任务从内存挂起到硬盘的速度 MB/s
 rental_time: 1.0 # 一次租赁操作所续租的时间
 
 # Downey's speedup model
-A: 64
-sigma: 0.0
+A: 16
+sigma: 0.2
 
 # 环境
 job_number: 200
