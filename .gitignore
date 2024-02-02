@@ -164,7 +164,7 @@ cython_debug/
 !.vscode/settings.json
 
 # Tensorboard log dir
-runs/
+/runs/
 
 # models dir
-models/
+/models/
