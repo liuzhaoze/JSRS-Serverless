@@ -1,4 +1,4 @@
-import sys
+import os
 
 import plotly.graph_objects as go
 
@@ -31,27 +31,48 @@ def get_varying_variables_figure(
             title=variable_name,
             titlefont_size=16,
             tickfont_size=14,
+            linecolor="black",  # 设置x轴线条颜色为黑色
+            mirror=True,  # 设置x轴线条在图表两侧都显示
         ),
         yaxis=dict(
             title=y_axis_label,
             titlefont_size=16,
             tickfont_size=14,
+            linecolor="black",  # 设置y轴线条颜色为黑色
+            mirror=True,  # 设置y轴线条在图表两侧都显示
+            gridcolor="grey",  # 设置网格线颜色为灰色
+            griddash="dash",  # 设置网格线为虚线
         ),
-        # legend=dict(
-        #     x=0,
-        #     y=1.0,
-        #     bgcolor="rgba(255, 255, 255, 0)",
-        #     bordercolor="rgba(255, 255, 255, 0)",
-        # ),
+        legend=dict(
+            x=0.5,
+            y=1.0,
+            xanchor="center",
+            yanchor="top",
+            orientation="h",  # 设置图例为水平排列
+            bgcolor="rgba(255, 255, 255, 255)",
+        ),
         barmode="group",
         bargap=0.15,  # gap between bars of adjacent location coordinates.
         bargroupgap=0.1,  # gap between bars of the same location coordinate.
+        plot_bgcolor="white",  # 设置图表背景颜色为白色
+        font=dict(color="black"),  # 设置所有文字颜色为黑色
+        autosize=False,
+        width=800,
+        height=500,
+        margin=dict(l=10, r=10, b=10, t=10),
     )
     return fig
 
 
 if __name__ == "__main__":
-    get_varying_variables_figure(
+    img_dir = r"D:\Rocco\Documents\研究生\论文\ADRL-basedTaskSchedulingMethodinServerlessComputing\asset\image\result"
+    SHOW = False
+    EXPORT = True
+
+    if not os.path.exists(img_dir):
+        raise FileNotFoundError(f"Directory {img_dir} not found")
+
+    fig = get_varying_variables_figure(
         "Arrival Rate",
         [10, 15, 20, 25, 30],
         {
@@ -85,9 +106,13 @@ if __name__ == "__main__":
             ],
         },
         "Average Response Time",
-    ).show()
+    )
+    if SHOW:
+        fig.show()
+    if EXPORT:
+        fig.write_image(os.path.join(img_dir, "arrival_rate_response_time.pdf"))
 
-    get_varying_variables_figure(
+    fig = get_varying_variables_figure(
         "Arrival Rate",
         [10, 15, 20, 25, 30],
         {
@@ -121,9 +146,13 @@ if __name__ == "__main__":
             ],
         },
         "Overall Cost",
-    ).show()
+    )
+    if SHOW:
+        fig.show()
+    if EXPORT:
+        fig.write_image(os.path.join(img_dir, "arrival_rate_overall_cost.pdf"))
 
-    get_varying_variables_figure(
+    fig = get_varying_variables_figure(
         "Average Job Length",
         [0.1, 0.15, 0.2, 0.25, 0.3],
         {
@@ -157,9 +186,13 @@ if __name__ == "__main__":
             ],
         },
         "Average Response Time",
-    ).show()
+    )
+    if SHOW:
+        fig.show()
+    if EXPORT:
+        fig.write_image(os.path.join(img_dir, "average_job_length_response_time.pdf"))
 
-    get_varying_variables_figure(
+    fig = get_varying_variables_figure(
         "Average Job Length",
         [0.1, 0.15, 0.2, 0.25, 0.3],
         {
@@ -193,9 +226,13 @@ if __name__ == "__main__":
             ],
         },
         "Overall Cost",
-    ).show()
+    )
+    if SHOW:
+        fig.show()
+    if EXPORT:
+        fig.write_image(os.path.join(img_dir, "average_job_length_overall_cost.pdf"))
 
-    get_varying_variables_figure(
+    fig = get_varying_variables_figure(
         "Proportion of Moldable Jobs",
         [0.1, 0.3, 0.5, 0.7, 0.9],
         {
@@ -229,9 +266,15 @@ if __name__ == "__main__":
             ],
         },
         "Average Response Time",
-    ).show()
+    )
+    if SHOW:
+        fig.show()
+    if EXPORT:
+        fig.write_image(
+            os.path.join(img_dir, "proportion_of_moldable_jobs_response_time.pdf")
+        )
 
-    get_varying_variables_figure(
+    fig = get_varying_variables_figure(
         "Proportion of Moldable Jobs",
         [0.1, 0.3, 0.5, 0.7, 0.9],
         {
@@ -265,4 +308,10 @@ if __name__ == "__main__":
             ],
         },
         "Overall Cost",
-    ).show()
+    )
+    if SHOW:
+        fig.show()
+    if EXPORT:
+        fig.write_image(
+            os.path.join(img_dir, "proportion_of_moldable_jobs_overall_cost.pdf")
+        )
