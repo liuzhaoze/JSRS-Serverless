@@ -45,7 +45,7 @@ def get_varying_variables_figure(
         ),
         legend=dict(
             x=0.5,
-            y=1.0,
+            y=0.99,
             xanchor="center",
             yanchor="top",
             orientation="h",  # 设置图例为水平排列
