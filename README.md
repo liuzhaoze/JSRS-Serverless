@@ -1,30 +1,32 @@
-# 使用方法
+# Get Started
 
-## 1 安装依赖
+English / [简体中文](./README_CN.md)
 
-> 待完善
+## 1 Install Dependencies
 
-## 2 配置
+> To be completed
 
-- 超参数配置文件：`./config/hyperparameters.yml`
-- 实例配置文件：`./config/instances.yml`
+## 2 Configuration
 
-## 3 训练
+- Hyperparameters configuration file: `./config/hyperparameters.yml`
+- Instance configuration file: `./config/instances.yml`
+
+## 3 Training
 
 ```shell
 python ./train.py
 ```
 
-- 日志文件保存在 `./runs` 目录下
-- 模型文件保存在 `./models` 目录下
+- Log files are saved in the `./runs` directory
+- Model files are saved in the `./models` directory
 
-## 4 评估
+## 4 Evaluation
 
 ```shell
 python ./eval.py <model_path>
 ```
 
-例如：
+For example:
 
 ```shell
 python ./eval.py ./models/Feb01_13-45-01.pth
@@ -36,21 +38,21 @@ python ./eval.py ./models/Feb01_13-45-01.pth
 tensorboard --logdir=runs
 ```
 
-## 6 结果绘制
+## 6 Plot Results
 
 ```shell
 python ./result/plot_result.py
 ```
 
-## 7 其他
+## 7 Others
 
 ```shell
-# 生成 Spot 实例价格
+# Generate Spot instance prices
 python ./generate_price.py
 
-# 查看实例价格
+# View instance prices
 python ./plot_price.py
 
-# 各项单元测试
+# Various unit tests
 python ./test.py
 ```
