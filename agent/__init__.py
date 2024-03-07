@@ -4,7 +4,7 @@ import torch
 
 
 class AgentBase:
-    def __init__(self, action_dim: int, device: torch.Tensor) -> None:
+    def __init__(self, action_dim: int, device: torch.device) -> None:
         self.action_dim = action_dim
         self.device = device
 
@@ -13,7 +13,7 @@ class AgentBase:
 
 
 class DRLAgent(AgentBase):
-    def __init__(self, strategy, action_dim: int, device: torch.Tensor) -> None:
+    def __init__(self, strategy, action_dim: int, device: torch.device) -> None:
         super().__init__(action_dim, device)
 
         self.strategy = strategy
@@ -33,7 +33,7 @@ class DRLAgent(AgentBase):
             with torch.no_grad():
                 return (
                     policy_net(state)
-                    .where(mask, float("-inf"))  # DOUBT: 会不会影响梯度计算？
+                    .where(mask, float("-inf"))
                     .unsqueeze(dim=0)
                     .argmax(dim=1)
                     .to(self.device)
@@ -41,7 +41,7 @@ class DRLAgent(AgentBase):
 
 
 class RandomAgent(AgentBase):
-    def __init__(self, action_dim: int, device: torch.Tensor) -> None:
+    def __init__(self, action_dim: int, device: torch.device) -> None:
         super().__init__(action_dim, device)
 
     def select_action(self, mask: torch.Tensor, *args) -> torch.Tensor:
@@ -49,7 +49,7 @@ class RandomAgent(AgentBase):
 
 
 class RoundRobinAgent(AgentBase):
-    def __init__(self, action_dim: int, device: torch.Tensor) -> None:
+    def __init__(self, action_dim: int, device: torch.device) -> None:
         super().__init__(action_dim, device)
 
         self.current_action = -1
@@ -60,7 +60,7 @@ class RoundRobinAgent(AgentBase):
 
 
 class EarliestAgent(AgentBase):
-    def __init__(self, action_dim: int, device: torch.Tensor) -> None:
+    def __init__(self, action_dim: int, device: torch.device) -> None:
         super().__init__(action_dim, device)
 
     def select_action(

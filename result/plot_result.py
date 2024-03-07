@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 
 # Settings
 SAVE = False
-IMG_DIR = r"D:\Rocco\Documents\研究生\论文\ADRL-basedTaskSchedulingMethodinServerlessComputing\asset\image\result"
+IMG_DIR = os.path.join(os.path.dirname(__file__), "output")
 DATA_PATH = os.path.join(os.path.dirname(__file__), "result.json")
 
 BAR_COLORS = cycle(
@@ -74,7 +74,7 @@ for key, value in data.items():
         col=2,
     )
     fig.update_layout(
-        font=dict(color="black", size=20),
+        font=dict(color="black", size=24),
         legend=dict(
             orientation="h",
             xanchor="center",
