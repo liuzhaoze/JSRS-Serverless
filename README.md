@@ -4,8 +4,6 @@ English / [简体中文](./README_CN.md)
 
 ## 1 Install Dependencies
 
-> To be completed
-
 ## 2 Configuration
 
 - Hyperparameters configuration file: `./config/hyperparameters.yml`

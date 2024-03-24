@@ -7,7 +7,7 @@ from environment.speedup_model import SpeedupModel
 
 SHOW = False
 EXPORT = True
-img_dir = r"D:\Rocco\Documents\研究生\论文\ADRL-basedTaskSchedulingMethodinServerlessComputing\asset\image"
+img_dir = os.path.join(os.path.dirname(__file__), "result")
 
 if not os.path.exists(img_dir):
     raise FileNotFoundError(f"Directory {img_dir} not found")

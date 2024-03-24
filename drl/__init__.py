@@ -109,7 +109,7 @@ class QValues:
         next_q_values = torch.zeros(next_states.shape[0], device=QValues.device)
         next_q_values[non_final_state_locations] = (
             target_net(non_final_states)
-            .where(non_final_masks, float("-inf"))  # DOUBT: 会不会影响梯度计算？
+            .where(non_final_masks, float("-inf"))
             .max(dim=1)
             .values.detach()
         )

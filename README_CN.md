@@ -4,8 +4,6 @@
 
 ## 1 安装依赖
 
-> 待完善
-
 ## 2 配置
 
 - 超参数配置文件：`./config/hyperparameters.yml`
