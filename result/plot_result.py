@@ -33,7 +33,7 @@ with open(DATA_PATH, "r") as f:
     data = ujson.load(f)
 
 for key, value in data.items():
-    fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.12)
+    fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.07)
     for method, result in value["average_response_time"].items():
         fig.add_trace(
             go.Bar(
@@ -74,20 +74,20 @@ for key, value in data.items():
         col=2,
     )
     fig.update_layout(
-        font=dict(color="black", size=24),
+        font=dict(family="Times New Roman", color="black", size=26),
         legend=dict(
             orientation="h",
             xanchor="center",
             yanchor="top",
-            x=0.45,
-            y=1.2,
+            x=0.46,
+            y=1.18,
             bgcolor="#EDEDED",
             bordercolor="Silver",
             borderwidth=3,
         ),
         plot_bgcolor="#EDEDED",
         autosize=False,
-        width=1000,
+        width=1500,
         height=500,
         margin=dict(l=10, r=10, b=10, t=10, pad=0),
     )
