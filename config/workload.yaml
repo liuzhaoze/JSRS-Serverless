@@ -1,0 +1,4 @@
+number: 1000
+arrival_rate: 20.0 # requests per second
+average_length: 10.0 # seconds
+region_number: 3

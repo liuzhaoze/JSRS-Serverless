@@ -1,0 +1,84 @@
+regions:
+- region_code: 0
+  region_name: us-east-1-nyc-1 # 纽约
+  instances:
+  - instance_type: c6g.medium
+    count: 2
+    cpu: 1
+    memory: 2048
+    price: 0.034
+  - instance_type: c6g.large
+    count: 2
+    cpu: 2
+    memory: 4096
+    price: 0.068
+  - instance_type: c6g.xlarge
+    count: 2
+    cpu: 4
+    memory: 8192
+    price: 0.136
+  - instance_type: c6g.2xlarge
+    count: 2
+    cpu: 8
+    memory: 16384
+    price: 0.272
+
+- region_code: 1
+  region_name: ap-southeast-1-bkk-1 # 泰国
+  instances:
+  - instance_type: c6g.medium
+    count: 2
+    cpu: 1
+    memory: 2048
+    price: 0.0392
+  - instance_type: c6g.large
+    count: 2
+    cpu: 2
+    memory: 4096
+    price: 0.0784
+  - instance_type: c6g.xlarge
+    count: 2
+    cpu: 4
+    memory: 8192
+    price: 0.1568
+  - instance_type: c6g.2xlarge
+    count: 2
+    cpu: 8
+    memory: 16384
+    price: 0.3136
+
+- region_code: 2
+  region_name: af-south-1-los-1 # 非洲
+  instances:
+  - instance_type: c6g.medium
+    count: 2
+    cpu: 1
+    memory: 2048
+    price: 0.0456
+  - instance_type: c6g.large
+    count: 2
+    cpu: 2
+    memory: 4096
+    price: 0.0912
+  - instance_type: c6g.xlarge
+    count: 2
+    cpu: 4
+    memory: 8192
+    price: 0.1824
+  - instance_type: c6g.2xlarge
+    count: 2
+    cpu: 8
+    memory: 16384
+    price: 0.3648
+
+data_transfer_speed:
+# MB/s
+- [ 1000, 10, 10 ]
+- [ 10, 1000, 10 ]
+- [ 10, 10, 1000 ]
+
+data_transfer_cost:
+# USD/GB
+- [ 0.01, 0.08, 0.02 ]
+- [ 0.09, 0.08, 0.09 ]
+- [ 0.147, 0.11, 0.137 ]
