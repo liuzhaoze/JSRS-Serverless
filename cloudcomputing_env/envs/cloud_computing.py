@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class CloudComputingEnv(gym.Env):
     metadata = {"render_modes": ["console", "file"]}
 
-    def __init__(self, args: "RunArgument", render_mode=[]):
+    def __init__(self, args: "RunArgument", render_mode=None):
         self.__workload_config = args.workload_config
         self.__cluster_config = args.cluster_config
         self.__sigma = 0.0
@@ -41,7 +41,7 @@ class CloudComputingEnv(gym.Env):
 
         self.action_space = gym.spaces.Discrete(self.N_INSTANCE)
 
-        assert set(render_mode) <= set(self.metadata["render_modes"])
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
 
         self.file = None
@@ -74,7 +74,7 @@ class CloudComputingEnv(gym.Env):
         self.__workload = Workload(self.__workload_config)
         self.__current_job = self.__workload.next()
 
-        if "file" in self.render_mode:
+        if self.render_mode == "file":
             if self.file is not None:
                 # close the previous file belonging to the previous episode
                 self.file.write("[\n" + self.file_buffer.getvalue() + "]\n")
@@ -159,20 +159,20 @@ class CloudComputingEnv(gym.Env):
         observation = self._get_obs()
         info = self._get_info()
 
-        if len(self.render_mode) != 0:
+        if self.render_mode is not None:
             self.render()
 
         return observation, reward, terminated, False, info
 
     def render(self):
-        if len(self.render_mode) == 0:
+        if self.render_mode is None:
             gym.logger.warn("You are calling render method without specifying any render mode.")
             return
 
-        if "console" in self.render_mode:
+        if self.render_mode == "console":
             print(self.render_console_content, end="", flush=True)
 
-        if "file" in self.render_mode:
+        if self.render_mode == "file":
             self.file_buffer.write(self.render_file_content)
 
     def close(self):

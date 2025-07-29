@@ -12,7 +12,7 @@ class RunArgument(BaseModel):
     device: str
     seed: int
     log_dir: DirectoryPath
-    render_mode: list[str]
+    render_mode: Optional[str]
     data_size_dataset_path: FilePath
     workload_config_path: FilePath
     workload_config: Optional[WorkloadConfig] = None
