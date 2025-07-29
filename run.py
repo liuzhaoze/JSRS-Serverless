@@ -8,6 +8,7 @@ import time
 import gymnasium as gym
 import numpy as np
 import torch
+from gymnasium.wrappers import FlattenObservation
 from tianshou.data import Collector, CollectStats, InfoStats, PrioritizedVectorReplayBuffer, VectorReplayBuffer
 from tianshou.env import SubprocVectorEnv
 from tianshou.policy import BasePolicy, DQNPolicy, RandomPolicy
@@ -110,7 +111,8 @@ def get_args() -> RunArgument:
 
 
 def get_env(args: RunArgument) -> gym.Env:
-    return gym.make("cloudcomputing_env/CloudComputing-v0", args=args, render_mode=args.render_mode)
+    raw_env = gym.make("cloudcomputing_env/CloudComputing-v0", args=args, render_mode=args.render_mode)
+    return FlattenObservation(raw_env)
 
 
 def get_policy(

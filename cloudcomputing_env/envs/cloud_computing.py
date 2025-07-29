@@ -31,11 +31,11 @@ class CloudComputingEnv(gym.Env):
 
         self.observation_space = gym.spaces.Dict(
             {
-                "parallelism": gym.spaces.Box(0, 1.0, shape=(self.N_INSTANCE,), dtype=float),
+                "parallelism": gym.spaces.Box(0, float("inf"), shape=(self.N_INSTANCE,), dtype=float),
                 "wait_time": gym.spaces.Box(0, float("inf"), shape=(self.N_INSTANCE,), dtype=float),
-                "expired_time": gym.spaces.Box(0, float("inf"), shape=(self.N_INSTANCE,), dtype=float),
+                "expired_time": gym.spaces.Box(float("-inf"), float("inf"), shape=(self.N_INSTANCE,), dtype=float),
                 "job_region": gym.spaces.MultiBinary(self.N_REGION),
-                "instance_region": gym.spaces.MultiBinary([self.N_REGION, self.N_INSTANCE]),
+                "instance_region": gym.spaces.MultiBinary([self.N_INSTANCE, self.N_REGION]),
             }
         )
 
