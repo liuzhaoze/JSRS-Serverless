@@ -21,9 +21,9 @@ class Workload:
         lengths = np.random.normal(config.average_length, 0.1 * config.average_length, config.number)
         parallelisms = np.random.choice([1, 2, 4, 8], config.number, p=[0.6, 0.25, 0.1, 0.05])
         regions = np.random.randint(0, config.region_number, config.number)
-        data_sizes = config.data_sizes
+        data_sizes = np.random.normal(config.average_data_size, 0.1 * config.average_data_size, config.number)
         self.__jobs = [
-            Job(i, arrival_times[i], lengths[i], parallelisms[i], regions[i], data_sizes[i])
+            Job(i, arrival_times[i], lengths[i], parallelisms[i], regions[i], int(data_sizes[i]))
             for i in range(config.number)
         ]
 

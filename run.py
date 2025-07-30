@@ -34,9 +34,6 @@ def get_args() -> RunArgument:
     parser.add_argument("--log-dir", type=str, default=f"./logs/{time.strftime('%Y%m%d-%H%M%S')}")
     parser.add_argument("--render-mode", type=str, default=None, help="Options: console, file.")
 
-    # Parameters for dataset
-    parser.add_argument("--data-size-dataset-path", type=str, default="./dataset/FB-2010_samples_24_times_1hr_0.tsv")
-
     # Parameters for workload
     parser.add_argument("--workload-config-path", type=str, default="./config/workload.yaml")
 

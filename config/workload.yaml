@@ -1,4 +1,5 @@
 number: 1000
 arrival_rate: 20.0 # requests per second
 average_length: 10.0 # seconds
+average_data_size: 1000 # Bytes
 region_number: 3

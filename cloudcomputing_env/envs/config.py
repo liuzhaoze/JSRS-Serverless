@@ -7,8 +7,8 @@ class WorkloadConfig(BaseModel):
     number: int
     arrival_rate: float
     average_length: float
+    average_data_size: int
     region_number: int
-    data_sizes: Optional[list[int]] = None
 
 
 class InstanceConfig(BaseModel):

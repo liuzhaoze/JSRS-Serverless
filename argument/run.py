@@ -13,7 +13,6 @@ class RunArgument(BaseModel):
     seed: int
     log_dir: DirectoryPath
     render_mode: Optional[str]
-    data_size_dataset_path: FilePath
     workload_config_path: FilePath
     workload_config: Optional[WorkloadConfig] = None
     cluster_config_path: FilePath
@@ -54,12 +53,6 @@ class RunArgument(BaseModel):
             raise ValueError(f"{v} should be an empty directory.")
         return v
 
-    @field_validator("data_size_dataset_path", mode="before")
-    def check_data_size_dataset_path(cls, v):
-        if not os.path.isfile(v):
-            raise ValueError(f"{v} does not exist.")
-        return v
-
     @field_validator("workload_config_path", mode="before")
     def check_workload_config_path(cls, v):
         if not os.path.isfile(v):
@@ -88,24 +81,6 @@ class RunArgument(BaseModel):
             raise ValueError(
                 f"Number of regions in cluster config ({len(self.cluster_config.regions)}) does not match workload config ({self.workload_config.region_number})."
             )
-        return self
-
-    @model_validator(mode="after")
-    def load_dataset(self):
-        df = pd.read_csv(
-            self.data_size_dataset_path,
-            sep="\t",
-            header=None,
-            names=[
-                "new_unique_job_id",
-                "submit_time_seconds",
-                "inter_job_submit_gap_seconds",
-                "map_input_bytes",
-                "shuffle_bytes",
-                "reduce_output_bytes",
-            ],
-        )
-        self.workload_config.data_sizes = df["map_input_bytes"].head(self.workload_config.number).tolist()
         return self
 
     @model_validator(mode="after")
