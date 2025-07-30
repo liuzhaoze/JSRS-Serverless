@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import secrets
 from typing import TYPE_CHECKING
@@ -125,20 +126,19 @@ class CloudComputingEnv(gym.Env):
             self.__workload.resubmit(self.__cluster[instance_id].expired_time, job_id)
 
         self.render_console_content = f"\rStep={self.num_steps}: Assign job({job_id}) to instance({instance_id})"
-        self.render_file_content = (
-            """{"arrival_time": %.6f, "job_id": %d, "success": %b, "start_time": %.6f, "finish_time": %.6f, "data_transfer_time": %.6f, "execution_time": %.6f, "data_transfer_cost": %.6f, "rental_cost": %.6f},\n"""
-            % (
-                arrival_time,
-                job_id,
-                success,
-                start_time,
-                finish_time,
-                data_transfer_time,
-                execution_time,
-                data_transfer_cost,
-                rental_cost,
-            )
-        )
+        file_content = {
+            "arrival_time": round(arrival_time, 6),
+            "job_id": job_id,
+            "success": success,
+            "start_time": round(start_time, 6),
+            "finish_time": round(finish_time, 6),
+            "data_transfer_time": round(data_transfer_time, 6),
+            "execution_time": round(execution_time, 6),
+            "data_transfer_cost": round(data_transfer_cost, 6),
+            "rental_cost": round(rental_cost, 6),
+        }
+        self.render_file_content = json.dumps(file_content) + ",\n"
+
         if job_id == len(self.__workload) - 1 and success:
             self.render_console_content += "\n"
             self.render_file_content = self.render_file_content[:-2] + "\n"
