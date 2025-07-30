@@ -31,6 +31,8 @@ class RunArgument(BaseModel):
     eps_begin: float
     eps_end: float
     eps_test: float
+    anneal_start: int
+    anneal_end: int
     reward_lambda: float
     num_train_env: int
     num_test_env: int

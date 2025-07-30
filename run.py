@@ -65,6 +65,8 @@ def get_args() -> RunArgument:
     parser.add_argument("--eps-begin", type=float, default=0.5, help="Exploration rate at the beginning of training")
     parser.add_argument("--eps-end", type=float, default=0.1, help="Exploration rate at the end of training")
     parser.add_argument("--eps-test", type=float, default=0.05, help="Exploration rate during testing")
+    parser.add_argument("--anneal-start", type=int, default=1e5, help="Step to start annealing beta and epsilon")
+    parser.add_argument("--anneal-end", type=int, default=1e6, help="Step to end annealing beta and epsilon")
 
     # Parameters for training
     parser.add_argument("--reward-lambda", type=float, default=2.0, help="Hyperparameter for reward function")
@@ -189,20 +191,24 @@ def train_agent(
     # train
     def train_fn(num_epoch: int, step_idx: int) -> None:
         # epsilon decay
-        if step_idx <= 1e5:
+        if step_idx <= args.anneal_start:
             eps = args.eps_begin
-        elif step_idx <= 5e5:
-            eps = args.eps_begin + (args.eps_end - args.eps_begin) * (step_idx - 1e5) / (4e5)
+        elif step_idx <= args.anneal_end:
+            eps = args.eps_begin + (args.eps_end - args.eps_begin) * (step_idx - args.anneal_start) / (
+                args.anneal_end - args.anneal_start
+            )
         else:
             eps = args.eps_end
         policy.set_eps(eps)
 
         # beta decay
         if args.prioritized_replay:
-            if step_idx <= 1e5:
+            if step_idx <= args.anneal_start:
                 beta = args.beta
-            elif step_idx <= 5e5:
-                beta = args.beta + (args.beta_final - args.beta) * (step_idx - 1e5) / 4e5
+            elif step_idx <= args.anneal_end:
+                beta = args.beta + (args.beta_final - args.beta) * (step_idx - args.anneal_start) / (
+                    args.anneal_end - args.anneal_start
+                )
             else:
                 beta = args.beta_final
             buf.set_beta(beta)
