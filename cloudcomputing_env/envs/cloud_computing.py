@@ -49,6 +49,14 @@ class CloudComputingEnv(gym.Env):
         self.log_dir = args.log_dir
 
     def _get_obs(self):
+        if self.__current_job is None:
+            return {
+                "parallelism": np.zeros(self.N_INSTANCE, dtype=float),
+                "wait_time": np.zeros(self.N_INSTANCE, dtype=float),
+                "expired_time": np.zeros(self.N_INSTANCE, dtype=float),
+                "job_region": np.zeros(self.N_REGION, dtype=bool),
+                "instance_region": np.zeros((self.N_INSTANCE, self.N_REGION), dtype=bool),
+            }
         return {
             "parallelism": np.array(self.__cluster.instance_cpu, dtype=float)
             / self.__workload[self.__current_job.job_id].parallelism,
