@@ -127,7 +127,13 @@ def get_policy(
     act_shape = action_space.shape or int(action_space.n)
 
     if policy is None:
-        net = Net(state_shape=obs_shape, action_shape=act_shape, hidden_sizes=args.hidden_sizes).to(args.device)
+        net = Net(
+            state_shape=obs_shape,
+            action_shape=act_shape,
+            hidden_sizes=args.hidden_sizes,
+            device=args.device,
+        ).to(args.device)
+
         if optimizer is None:
             optimizer = torch.optim.Adam(net.parameters(), lr=args.lr)
 
@@ -138,7 +144,7 @@ def get_policy(
             discount_factor=args.gamma,
             estimation_step=args.td_step,
             target_update_freq=args.target_update_freq,
-        )
+        ).to(args.device)
 
         if args.evaluation:
             print(f"Loading model from {args.model_path}")
