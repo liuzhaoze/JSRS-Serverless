@@ -147,11 +147,12 @@ class CloudComputingEnv(gym.Env):
         }
         self.render_file_content = json.dumps(file_content) + ",\n"
 
-        if job_id == len(self.__workload) - 1 and success:
+        self.__current_job = self.__workload.next()
+
+        if self.__current_job is None:
             self.render_console_content += "\n"
             self.render_file_content = self.render_file_content[:-2] + "\n"
 
-        self.__current_job = self.__workload.next()
         self.num_steps += 1
 
         terminated = self.__current_job is None
