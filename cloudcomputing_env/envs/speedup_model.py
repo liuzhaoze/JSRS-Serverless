@@ -1,4 +1,4 @@
-def S(A, sigma, n):
+def SU(A, sigma, n):
     if 0 <= sigma <= 1:
         if 1 <= n <= A:
             return A * n / (A + sigma * (n - 1) / 2)
