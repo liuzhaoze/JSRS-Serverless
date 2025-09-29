@@ -8,7 +8,7 @@ import gymnasium as gym
 import numpy as np
 
 from cloudcomputing_env.envs.cluster import Cluster
-from cloudcomputing_env.envs.speedup_model import S
+from cloudcomputing_env.envs.speedup_model import SU
 from cloudcomputing_env.envs.workload import Workload
 
 if TYPE_CHECKING:
@@ -121,7 +121,7 @@ class CloudComputingEnv(gym.Env):
 
         parallelism = self.__workload[job_id].parallelism
         length = self.__workload[job_id].length
-        execution_time = length * parallelism / S(parallelism, self.__sigma, self.__cluster[instance_id].cpu)
+        execution_time = length * parallelism / SU(parallelism, self.__sigma, self.__cluster[instance_id].cpu)
 
         finish_time = start_time + data_transfer_time + execution_time
 
