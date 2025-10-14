@@ -1,7 +1,6 @@
 import os
 from typing import Literal, Optional
 
-import pandas as pd
 import yaml
 from pydantic import BaseModel, DirectoryPath, FilePath, field_validator, model_validator
 
@@ -45,7 +44,7 @@ class RunArgument(BaseModel):
     model_path: Optional[FilePath]
     num_eval_env: int
     eval_episode: int
-    baseline: Optional[Literal["random"]]
+    baseline: Optional[Literal["random", "roundrobin", "earliest"]]
 
     @field_validator("log_dir", mode="before")
     def create_and_check_log_dir(cls, v):
@@ -89,7 +88,7 @@ class RunArgument(BaseModel):
     def check_model_path_when_evaluation(self):
         if self.evaluation:
             match self.baseline:
-                case "random":
+                case "random" | "roundrobin" | "earliest":
                     pass  # model is not needed
                 case None:
                     if self.model_path is None:

@@ -11,13 +11,14 @@ import torch
 from gymnasium.wrappers import FlattenObservation
 from tianshou.data import Collector, CollectStats, InfoStats, PrioritizedVectorReplayBuffer, VectorReplayBuffer
 from tianshou.env import SubprocVectorEnv
-from tianshou.policy import BasePolicy, DQNPolicy, RandomPolicy
+from tianshou.policy import BasePolicy, DQNPolicy
 from tianshou.trainer import OffpolicyTrainer
 from tianshou.utils import TensorboardLogger
 from tianshou.utils.net.common import Net
 from torch.utils.tensorboard import SummaryWriter
 
 from argument.run import RunArgument
+from baseline import EarliestPolicy, RandomPolicy, RoundRobinPolicy
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +99,7 @@ def get_args() -> RunArgument:
     parser.add_argument("--model-path", type=str, nargs="?", help="Path to the model to be evaluated")
     parser.add_argument("--num-eval-env", type=int, default=8, help="Number of evaluation environments")
     parser.add_argument("--eval-episode", type=int, default=16, help="Number of episodes for evaluation")
-    parser.add_argument("--baseline", type=str, nargs="?", help="Options: random")
+    parser.add_argument("--baseline", type=str, nargs="?", help="Options: random, roundrobin, earliest")
 
     known_args, unknown_args = parser.parse_known_args()
 
@@ -292,6 +293,14 @@ if __name__ == "__main__":
             case "random":
                 env = get_env(args)
                 policy = RandomPolicy(action_space=env.action_space)
+                result = evaluate_agent(args, policy)
+            case "roundrobin":
+                env = get_env(args)
+                policy = RoundRobinPolicy(action_space=env.action_space)
+                result = evaluate_agent(args, policy)
+            case "earliest":
+                env = get_env(args)
+                policy = EarliestPolicy(action_space=env.action_space)
                 result = evaluate_agent(args, policy)
 
     with open(os.path.join(args.log_dir, f"{'train' if not args.evaluation else 'eval'}_result.pkl"), "wb") as f:
